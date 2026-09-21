@@ -460,59 +460,60 @@
       </div>
     </div>
 
-    <!-- ================= ポーズメニュー画面 ================= -->
+    <!-- ================= ポーズメニュー画面 (横画面最適化・2カラム・スクロール不要) ================= -->
     <div id="pause-screen" class="modal-overlay hidden">
-      <div class="terminal-modal small">
-        <h2 class="modal-title">作戦一時停止中</h2>
-        <p class="modal-sub">TACTICAL PAUSE</p>
+      <div class="terminal-modal small pause-modal-compact">
+        <div class="pause-header-compact">
+          <h2 class="modal-title">作戦一時停止中</h2>
+          <span class="modal-sub">TACTICAL PAUSE</span>
+        </div>
 
-        <div class="pause-settings-panel">
-          <div class="setting-item">
-            <label for="pause-select-quality">グラフィック画質:</label>
-            <select id="pause-select-quality" class="cyber-select">
-              <option value="low">低 (超軽量)</option>
-              <option value="medium">中 (標準)</option>
-              <option value="high">高 (高画質)</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label for="pause-input-sens">タッチ視点感度: <span id="pause-sens-val">1.00</span></label>
-            <input type="range" id="pause-input-sens" min="0.2" max="3.0" step="0.1" value="1.00">
-          </div>
-          <div class="setting-item">
-            <div class="toggle-switch-wrapper">
-              <label for="pause-toggle-gyro">ジャイロ照準:</label>
-              <input type="checkbox" id="pause-toggle-gyro" class="toggle-checkbox">
+        <div class="pause-body-columns">
+          <!-- 左列: 設定項目 -->
+          <div class="pause-settings-panel">
+            <div class="setting-item">
+              <label for="pause-select-quality">グラフィック:</label>
+              <select id="pause-select-quality" class="cyber-select">
+                <option value="low">低 (超軽量)</option>
+                <option value="medium">中 (標準)</option>
+                <option value="high">高 (高画質)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label for="pause-input-sens">感度: <span id="pause-sens-val">1.00</span></label>
+              <input type="range" id="pause-input-sens" min="0.2" max="3.0" step="0.1" value="1.00">
+            </div>
+            <div class="setting-item">
+              <div class="toggle-switch-wrapper">
+                <label for="pause-toggle-gyro">ジャイロ照準:</label>
+                <input type="checkbox" id="pause-toggle-gyro" class="toggle-checkbox">
+              </div>
+            </div>
+            <div class="setting-item">
+              <label for="pause-input-sfx-vol">効果音: <span id="pause-sfx-vol-val">80%</span></label>
+              <input type="range" id="pause-input-sfx-vol" min="0" max="100" step="5" value="80">
+            </div>
+            <div class="setting-item">
+              <label for="pause-input-bgm-vol">BGM: <span id="pause-bgm-vol-val">10%</span></label>
+              <input type="range" id="pause-input-bgm-vol" min="0" max="100" step="5" value="10">
             </div>
           </div>
-          <div class="setting-item">
-            <label for="pause-input-sfx-vol">効果音(銃声): <span id="pause-sfx-vol-val">80%</span></label>
-            <input type="range" id="pause-input-sfx-vol" min="0" max="100" step="5" value="80">
-          </div>
-          <div class="setting-item">
-            <label for="pause-input-bgm-vol">BGM音量: <span id="pause-bgm-vol-val">10%</span></label>
-            <input type="range" id="pause-input-bgm-vol" min="0" max="100" step="5" value="10">
-          </div>
-        </div>
 
-        <div class="modal-btn-group">
-          <button id="btn-resume-game" class="btn-cyber-primary">作戦を再開する</button>
-          <button id="btn-restart-game" class="btn-cyber-secondary">最初からやり直す</button>
-        </div>
-        <button id="btn-pause-custom-hud" class="btn-cyber-secondary" style="border-color: #00f3ff; color: #00f3ff; width: 100%; margin-top: 8px; font-weight: 800;">
-          🎮 ボタン配置・サイズ設定 (HUDカスタム)
-        </button>
-        <button id="btn-pause-ex" class="btn-cyber-secondary" style="border-color: #ffd700; color: #ffd700; width: 100%; margin-top: 8px; font-weight: 800;">
-          🚀 EXステージへワープ
-        </button>
-
-        <div style="display: flex; gap: 8px; margin-top: 10px; width: 100%;">
-          <button id="btn-toggle-perf-monitor" class="btn-cyber-secondary" style="flex: 1; font-size: 11px; padding: 7px 10px; border-color: rgba(0, 243, 255, 0.4); color: #00f3ff;">
-            📊 性能モニタ
-          </button>
-          <a href="../" class="btn-cyber-secondary" style="flex: 1; font-size: 11px; padding: 7px 10px; border-color: rgba(255, 255, 255, 0.3); color: #fff; text-align: center; text-decoration: none;">
-            💻 PC版へ
-          </a>
+          <!-- 右列: アクションボタン群 -->
+          <div class="pause-actions-panel">
+            <button id="btn-resume-game" class="btn-cyber-primary resume-main">作戦を再開する</button>
+            <button id="btn-pause-custom-hud" class="btn-cyber-secondary hud-custom-btn">
+              🎮 ボタン配置・サイズ設定
+            </button>
+            <button id="btn-pause-ex" class="btn-cyber-secondary ex-warp-btn">
+              🚀 EXステージへワープ
+            </button>
+            <div class="pause-bottom-row">
+              <button id="btn-restart-game" class="btn-cyber-secondary tiny-btn">最初から</button>
+              <button id="btn-toggle-perf-monitor" class="btn-cyber-secondary tiny-btn">📊 性能</button>
+              <a href="../" class="btn-cyber-secondary tiny-btn">💻 PC版</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -522,16 +523,28 @@
       <div class="hud-custom-backdrop"></div>
       <div class="hud-custom-bar">
         <div class="hud-custom-col info-col">
-          <span class="hud-custom-badge">🎮 HUDカスタマイズ</span>
-          <span id="hud-custom-target-name" class="hud-custom-target">ボタンをドラッグで移動 / タップで選択</span>
+          <span class="hud-custom-badge">🎮 HUDカスタム</span>
+          <span id="hud-custom-target-name" class="hud-custom-target">選択中: [FIRE]</span>
         </div>
+
+        <!-- 確実な切替用: ボタン選択クイックチップス -->
+        <div class="hud-custom-chips" id="hud-custom-chips-bar">
+          <button type="button" class="btn-custom-chip active" data-id="btn-fire">FIRE</button>
+          <button type="button" class="btn-custom-chip" data-id="btn-jump">JUMP</button>
+          <button type="button" class="btn-custom-chip" data-id="btn-crouch">SLIDE</button>
+          <button type="button" class="btn-custom-chip" data-id="btn-ads">ADS</button>
+          <button type="button" class="btn-custom-chip" data-id="btn-reload">RELOAD</button>
+          <button type="button" class="btn-custom-chip" data-id="btn-grenade">GRENADE</button>
+          <button type="button" class="btn-custom-chip" data-id="btn-bullet-time">TIME</button>
+        </div>
+
         <div class="hud-custom-col size-col">
           <label class="hud-size-lbl" for="hud-custom-size-slider">サイズ: <span id="hud-custom-size-display">100%</span></label>
           <input type="range" id="hud-custom-size-slider" min="65" max="160" step="5" value="100">
         </div>
         <div class="hud-custom-col btn-col">
-          <button id="btn-hud-custom-reset" class="btn-custom-sub">初期化</button>
-          <button id="btn-hud-custom-save" class="btn-custom-main">保存して完了</button>
+          <button type="button" id="btn-hud-custom-reset" class="btn-custom-sub">初期化</button>
+          <button type="button" id="btn-hud-custom-save" class="btn-custom-main">保存して完了</button>
         </div>
       </div>
     </div>

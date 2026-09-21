@@ -502,18 +502,18 @@ html, body, #app {
   padding: 1px 3px !important;
 }
 
-/* 兵装強化ステータスバッジ: レーダーのすぐ左にワイドな横幅（265-285px）を確保した2列グリッド */
+/* 兵装強化ステータスバッジ: レーダーのすぐ左に3列グリッドでコンパクト整列 */
 #hud-upgrades-bar {
   display: flex !important;
   flex-direction: column !important;
   gap: 2px !important;
-  padding: 3px 8px !important;
+  padding: 3px 6px !important;
   background: rgba(6, 12, 24, 0.78) !important;
   border: 1px solid rgba(0, 243, 255, 0.28) !important;
   border-radius: 5px !important;
-  min-width: 265px !important;
+  min-width: 255px !important;
   max-width: 285px !important;
-  width: 275px !important;
+  width: 270px !important;
 }
 
 #hud-upgrades-bar .hud-label {
@@ -526,14 +526,14 @@ html, body, #app {
 
 .upgrade-badges-row {
   display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 2.5px 8px !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2px 4px !important;
   width: 100% !important;
 }
 
 .upgrade-badge, .status-badge {
-  font-size: 8px !important;
-  padding: 2px 5px !important;
+  font-size: 7.5px !important;
+  padding: 1.5px 3px !important;
   border-radius: 3px !important;
   line-height: 1.1 !important;
   white-space: nowrap !important;
@@ -541,10 +541,10 @@ html, body, #app {
   box-sizing: border-box !important;
 }
 
-/* 3. HUD VITALS DISPLAY (一時停止ボタンの下・性能モニタの上に配置し、読みやすく再設計) */
+/* 3. HUD VITALS DISPLAY (一時停止ボタンの下・適度な余白10pxを確保) */
 #hud-bottom-left {
   position: absolute !important;
-  top: calc(44px + var(--safe-top)) !important;
+  top: calc(52px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   bottom: auto !important;
   width: 106px !important;
@@ -870,23 +870,25 @@ html, body, #app {
   transform: translateX(22px);
 }
 
-/* ================= 性能テレメトリモニタ (バイタル表示の直下・2行表示) ================= */
+/* ================= 性能テレメトリモニタ (バイタル表示の直下余白10px・4列×2行表示) ================= */
 .perf-monitor-hud {
   position: absolute !important;
-  top: calc(108px + var(--safe-top)) !important;
+  top: calc(118px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   display: grid !important;
-  grid-template-columns: auto auto !important;
-  gap: 2px 6px !important;
-  padding: 2.5px 6px !important;
+  grid-template-columns: repeat(4, auto) !important;
+  gap: 2px 8px !important;
+  padding: 2.5px 8px !important;
   font-size: 8px !important;
-  background: rgba(6, 12, 22, 0.88) !important;
+  background: rgba(6, 12, 22, 0.9) !important;
   border: 1px solid rgba(0, 243, 255, 0.35) !important;
   border-radius: 4px !important;
   z-index: 91 !important;
   pointer-events: none !important;
   white-space: nowrap !important;
-  width: 106px !important;
+  width: auto !important;
+  min-width: 185px !important;
+  max-width: 225px !important;
   box-sizing: border-box !important;
   transform: none !important;
 }
@@ -894,7 +896,7 @@ html, body, #app {
 .perf-item {
   display: flex !important;
   align-items: center !important;
-  gap: 3px !important;
+  gap: 2.5px !important;
 }
 
 .perf-lbl {
@@ -907,15 +909,15 @@ html, body, #app {
   font-family: var(--font-mono) !important;
 }
 
-/* ================= ピックアップ通知トースト (性能モニタ直下・左端揃え) ================= */
+/* ================= ピックアップ通知トースト (2行性能モニタ直下・開始位置降下) ================= */
 #pickup-toast-container {
   position: absolute !important;
-  top: calc(146px + var(--safe-top)) !important;
+  top: calc(152px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 3px !important;
-  max-height: calc(100vh - 160px) !important;
+  max-height: calc(100vh - 165px) !important;
   overflow: hidden !important;
   align-items: flex-start !important;
   pointer-events: none !important;
@@ -992,21 +994,22 @@ html, body, #app {
 
 /* ================= HUD ボタン配置・サイズカスタマイザー ================= */
 body.hud-editing #touch-controls-layer {
-  z-index: 250 !important;
+  z-index: 350 !important;
   pointer-events: auto !important;
 }
 
 body.hud-editing .touch-action-group .touch-btn {
-  outline: 2px dashed rgba(0, 243, 255, 0.75) !important;
+  outline: 2px dashed rgba(0, 243, 255, 0.85) !important;
   outline-offset: 3px !important;
   touch-action: none !important;
   cursor: move !important;
-  box-shadow: 0 0 16px rgba(0, 243, 255, 0.5) !important;
+  box-shadow: 0 0 16px rgba(0, 243, 255, 0.6) !important;
+  pointer-events: auto !important;
 }
 
 body.hud-editing .touch-action-group .touch-btn.custom-selected {
   outline: 3px dashed #ffd700 !important;
-  box-shadow: 0 0 24px rgba(255, 215, 0, 0.85) !important;
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.9) !important;
 }
 
 #hud-custom-editor {
@@ -1027,27 +1030,55 @@ body.hud-editing .touch-action-group .touch-btn.custom-selected {
   position: absolute !important;
   top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.35);
-  pointer-events: auto;
+  pointer-events: none !important; /* ボタンへのクリック・タッチを遮断しない */
 }
 
 .hud-custom-bar {
   position: absolute !important;
-  top: calc(8px + var(--safe-top)) !important;
+  top: calc(6px + var(--safe-top)) !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  width: min(92vw, 640px) !important;
-  background: rgba(8, 14, 28, 0.95) !important;
+  width: min(94vw, 760px) !important;
+  background: rgba(8, 14, 28, 0.96) !important;
   border: 1.5px solid #00f3ff !important;
   box-shadow: 0 0 25px rgba(0, 243, 255, 0.45) !important;
   border-radius: 8px !important;
-  padding: 8px 14px !important;
+  padding: 6px 12px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 12px !important;
+  gap: 10px !important;
   pointer-events: auto !important;
-  backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(12px) !important;
   box-sizing: border-box !important;
+  z-index: 380 !important;
+}
+
+.hud-custom-chips {
+  display: flex !important;
+  gap: 4px !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  max-width: 270px !important;
+}
+
+.btn-custom-chip {
+  padding: 3px 6px !important;
+  font-size: 8.5px !important;
+  font-weight: 800 !important;
+  background: rgba(14, 20, 36, 0.9) !important;
+  border: 1px solid rgba(0, 243, 255, 0.4) !important;
+  color: #94a3b8 !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.btn-custom-chip.active {
+  border-color: #ffd700 !important;
+  background: rgba(255, 215, 0, 0.25) !important;
+  color: #ffd700 !important;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5) !important;
 }
 
 .hud-custom-col {
@@ -1132,3 +1163,124 @@ body.hud-editing .touch-action-group .touch-btn.custom-selected {
 .btn-custom-main:active {
   transform: scale(0.95) !important;
 }
+
+/* ================= ポーズメニュー 横画面2カラム・スクロール完全撤廃レイアウト ================= */
+#pause-screen .terminal-modal.small {
+  max-width: min(94vw, 560px) !important;
+  width: min(94vw, 560px) !important;
+  max-height: 94vh !important;
+  padding: 10px 18px !important;
+  overflow: visible !important;
+}
+
+.pause-header-compact {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  margin-bottom: 6px !important;
+  border-bottom: 1px solid rgba(0, 243, 255, 0.25) !important;
+  padding-bottom: 3px !important;
+}
+
+.pause-header-compact .modal-title {
+  font-size: 16px !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+}
+
+.pause-header-compact .modal-sub {
+  font-size: 9px !important;
+  color: #64748b !important;
+  letter-spacing: 1px !important;
+  margin: 0 !important;
+}
+
+.pause-body-columns {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  align-items: stretch !important;
+}
+
+.pause-settings-panel {
+  flex: 1 1 48% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin: 0 !important;
+}
+
+.pause-settings-panel .setting-item {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+}
+
+.pause-settings-panel label {
+  font-size: 9px !important;
+  color: #94a3b8 !important;
+  margin: 0 !important;
+}
+
+.pause-settings-panel .cyber-select {
+  padding: 2px 6px !important;
+  font-size: 9.5px !important;
+  height: 22px !important;
+}
+
+.pause-settings-panel input[type="range"] {
+  height: 4px !important;
+  margin: 1px 0 !important;
+}
+
+.pause-actions-panel {
+  flex: 1 1 52% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  justify-content: space-between !important;
+}
+
+.pause-actions-panel .resume-main {
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  width: 100% !important;
+  letter-spacing: 1px !important;
+}
+
+.pause-actions-panel .hud-custom-btn {
+  border-color: #00f3ff !important;
+  color: #00f3ff !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  padding: 6px 10px !important;
+  width: 100% !important;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3) !important;
+}
+
+.pause-actions-panel .ex-warp-btn {
+  border-color: #ffd700 !important;
+  color: #ffd700 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  padding: 5px 8px !important;
+  width: 100% !important;
+}
+
+.pause-bottom-row {
+  display: flex !important;
+  gap: 5px !important;
+  width: 100% !important;
+}
+
+.pause-bottom-row .tiny-btn {
+  flex: 1 !important;
+  font-size: 9px !important;
+  padding: 5px 4px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+}
+

@@ -60,6 +60,9 @@ class MobileCyberStrikeApp {
 
     // 9. Setup HUD Customizer (Position drag & drop, size slider, persistence)
     this.setupHudCustomizer();
+
+    // 10. Setup auto-pause on portrait orientation during gameplay
+    this.setupOrientationAutoPause();
   }
 
   setupAudioUnlock() {
@@ -285,6 +288,12 @@ class MobileCyberStrikeApp {
           else el.classList.remove('custom-selected');
         }
       });
+      // Update quick selection chips in toolbar
+      const chips = document.querySelectorAll('.btn-custom-chip');
+      chips.forEach(c => {
+        if (c.dataset.id === btnDef.id) c.classList.add('active');
+        else c.classList.remove('active');
+      });
       if (targetName) targetName.textContent = `選択中: [${btnDef.name}]`;
       const currentScale = currentLayout[btnDef.id]?.scale || 100;
       if (slider) slider.value = currentScale;
@@ -320,6 +329,17 @@ class MobileCyberStrikeApp {
 
     if (btnSave) btnSave.addEventListener('click', () => closeEditor(true));
     if (btnReset) btnReset.addEventListener('click', () => resetLayout());
+
+    // Click handler for custom chips
+    const chipsBar = document.getElementById('hud-custom-chips-bar');
+    if (chipsBar) {
+      chipsBar.addEventListener('click', (e) => {
+        const chip = e.target.closest('.btn-custom-chip');
+        if (!chip) return;
+        const targetDef = HUD_BUTTONS.find(b => b.id === chip.dataset.id);
+        if (targetDef) selectButton(targetDef);
+      });
+    }
 
     // Slider for scale
     if (slider) {
@@ -429,10 +449,36 @@ class MobileCyberStrikeApp {
           window.addEventListener('pointerup', upHandler);
         }
       });
+      // Direct click to select during editing
+      el.addEventListener('click', (e) => {
+        if (!document.body.classList.contains('hud-editing')) return;
+        selectButton(btnDef);
+      });
     });
 
     // Initial load
     loadSavedLayout();
+  }
+
+  setupOrientationAutoPause() {
+    const checkOrientation = () => {
+      const isPortrait = window.innerHeight > window.innerWidth;
+      if (isPortrait && this.game && this.game.state === 'PLAYING') {
+        this.game.pauseGame();
+      }
+    };
+
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkOrientation, 100);
+      setTimeout(checkOrientation, 300);
+    });
+    if (window.screen?.orientation) {
+      window.screen.orientation.addEventListener('change', () => {
+        setTimeout(checkOrientation, 100);
+        setTimeout(checkOrientation, 300);
+      });
+    }
   }
 }
 
