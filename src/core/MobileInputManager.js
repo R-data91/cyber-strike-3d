@@ -377,11 +377,6 @@ export class MobileInputManager {
       btnFire.addEventListener('touchcancel', releaseFire, { passive: true });
     }
 
-    // Left Secondary Fire Button
-    const btnLeftFire = this.dom.btnLeftFire;
-    if (btnLeftFire) {
-      bindBtn(btnLeftFire, () => { this.mouse.left = true; }, () => { this.mouse.left = false; });
-    }
 
     // ADS / Precision Aim Button (Toggle mode)
     const btnAds = this.dom.btnAds;
@@ -465,6 +460,10 @@ export class MobileInputManager {
       bindBtn(btnFullscreen, () => {
         this.toggleFullscreen();
       });
+      btnFullscreen.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.toggleFullscreen();
+      });
     }
   }
 
@@ -534,20 +533,35 @@ export class MobileInputManager {
 
   toggleFullscreen() {
     try {
-      if (!document.fullscreenElement) {
-        const docEl = document.documentElement;
+      const docEl = document.documentElement;
+      const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+
+      if (!isFullscreen) {
         if (docEl.requestFullscreen) {
-          docEl.requestFullscreen().catch(() => {});
+          docEl.requestFullscreen().catch(() => {
+            this.handleFullscreenFallback();
+          });
         } else if (docEl.webkitRequestFullscreen) {
           docEl.webkitRequestFullscreen();
+        } else {
+          this.handleFullscreenFallback();
         }
       } else {
         if (document.exitFullscreen) {
           document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
         }
       }
     } catch (e) {
-      console.warn('Fullscreen toggle not permitted:', e);
+      this.handleFullscreenFallback();
+    }
+  }
+
+  handleFullscreenFallback() {
+    window.scrollTo(0, 1);
+    if (window.game && window.game.hud && typeof window.game.hud.showPickupToast === 'function') {
+      window.game.hud.showPickupToast('📱 iOS Safariは「共有 ➔ ホーム画面に追加」で全画面アプリ化できます', 'supply');
     }
   }
 

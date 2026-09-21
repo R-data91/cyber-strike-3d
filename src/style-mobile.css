@@ -1,4 +1,4 @@
-/* CYBER STRIKE 3D - MOBILE & TABLET OPTIMIZED STYLESHEET */
+/* CYBER STRIKE 3D - MOBILE & TABLET OPTIMIZED STYLESHEET (V2 RESPONSIVE) */
 @import './style.css';
 
 /* Touch & Gesture Prevention */
@@ -96,12 +96,12 @@ html, body, #app {
   overflow: hidden;
 }
 
-/* Left Joystick Zone (Full left half of the screen) */
+/* Left Joystick Zone (Left half of the screen) */
 #joystick-zone {
   position: absolute;
   top: 0;
   left: 0;
-  width: 48vw;
+  width: 44vw;
   height: 100vh;
   pointer-events: auto;
   touch-action: none;
@@ -110,14 +110,14 @@ html, body, #app {
 
 #joystick-base {
   position: absolute;
-  width: 124px;
-  height: 124px;
-  margin-left: -62px;
-  margin-top: -62px;
+  width: 114px;
+  height: 114px;
+  margin-left: -57px;
+  margin-top: -57px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, rgba(0, 30, 60, 0.5) 80%);
-  border: 2px solid rgba(0, 243, 255, 0.5);
-  box-shadow: 0 0 24px rgba(0, 243, 255, 0.3), inset 0 0 16px rgba(0, 243, 255, 0.2);
+  background: radial-gradient(circle, rgba(0, 243, 255, 0.08) 0%, rgba(0, 30, 60, 0.45) 80%);
+  border: 1.8px solid rgba(0, 243, 255, 0.45);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.25), inset 0 0 14px rgba(0, 243, 255, 0.15);
   pointer-events: none;
   opacity: 0;
   transform: scale(0.85);
@@ -133,48 +133,48 @@ html, body, #app {
 }
 
 #joystick-stick {
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #00f3ff 0%, #0088cc 75%, #004466 100%);
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 0 18px rgba(0, 243, 255, 0.9);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 16px rgba(0, 243, 255, 0.85);
   pointer-events: none;
   will-change: transform;
 }
 
 .joystick-sprint-hint {
   position: absolute;
-  top: -26px;
-  font-size: 11px;
+  top: -24px;
+  font-size: 10px;
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--neon-cyan);
   letter-spacing: 1px;
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
-/* Right Aim Surface Zone (Handles camera rotation when touching non-button areas) */
+/* Right Aim Surface Zone - z-index 20 so HUD and buttons sit safely on top */
 #aim-zone {
   position: absolute;
   top: 0;
   right: 0;
-  width: 52vw;
+  width: 56vw;
   height: 100vh;
   pointer-events: auto;
   touch-action: none;
-  z-index: 41;
+  z-index: 20;
 }
 
-/* Action Button Container - Placed in front of aim-zone */
+/* Action Button Container - Highest z-index for instant tap responsiveness */
 .touch-action-group {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 50;
+  z-index: 70;
 }
 
-/* General Touch Button */
+/* General Touch Button (Futuristic Ghost Glass Design) */
 .touch-btn {
   pointer-events: auto !important;
   touch-action: none !important;
@@ -182,15 +182,15 @@ html, body, #app {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(8, 16, 32, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1.8px solid rgba(0, 243, 255, 0.45);
+  background: rgba(6, 14, 28, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1.5px solid rgba(0, 243, 255, 0.45);
   color: var(--text-main);
   font-family: var(--font-display);
   border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 243, 255, 0.2);
-  transition: transform 0.08s ease, border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 8px rgba(0, 243, 255, 0.15);
+  transition: transform 0.06s ease, border-color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -199,116 +199,70 @@ html, body, #app {
   transform: scale(0.92);
   background: rgba(0, 243, 255, 0.35);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 24px var(--neon-cyan-glow), inset 0 0 16px rgba(0, 243, 255, 0.5);
+  box-shadow: 0 0 20px var(--neon-cyan-glow), inset 0 0 14px rgba(0, 243, 255, 0.4);
 }
 
 .touch-btn-icon {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .touch-btn-label {
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  margin-top: 2px;
-  opacity: 0.92;
+  margin-top: 1px;
+  opacity: 0.9;
 }
 
 /* ================= 右下大型メイン射撃ボタン (RIGHT-BOTTOM PRIMARY FIRE) ================= */
 #btn-fire {
   position: absolute;
-  bottom: calc(16px + var(--safe-bottom));
-  right: calc(16px + var(--safe-right));
-  width: 90px;
-  height: 90px;
+  bottom: calc(14px + var(--safe-bottom));
+  right: calc(14px + var(--safe-right));
+  width: 82px;
+  height: 82px;
   border-radius: 50%;
-  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.4) 0%, rgba(255, 70, 0, 0.25) 50%, rgba(18, 10, 24, 0.9) 90%);
-  border: 3px solid #ff0055;
-  box-shadow: 0 0 28px rgba(255, 0, 85, 0.65), 0 0 12px rgba(255, 120, 0, 0.4), inset 0 0 18px rgba(255, 0, 85, 0.5);
-  z-index: 60;
-  animation: fire-pulse 3s infinite alternate ease-in-out;
-}
-
-@keyframes fire-pulse {
-  0% { box-shadow: 0 0 24px rgba(255, 0, 85, 0.55), inset 0 0 14px rgba(255, 0, 85, 0.4); }
-  100% { box-shadow: 0 0 34px rgba(255, 0, 85, 0.85), inset 0 0 22px rgba(255, 0, 85, 0.6); }
+  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.35) 0%, rgba(255, 70, 0, 0.2) 50%, rgba(18, 10, 24, 0.85) 90%);
+  border: 2.5px solid #ff0055;
+  box-shadow: 0 0 24px rgba(255, 0, 85, 0.55), inset 0 0 16px rgba(255, 0, 85, 0.4);
+  z-index: 75;
 }
 
 #btn-fire:active, #btn-fire.pressed {
   transform: scale(0.92);
-  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.8) 0%, rgba(255, 50, 0, 0.5) 70%, rgba(18, 10, 24, 0.95) 100%);
+  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.75) 0%, rgba(255, 50, 0, 0.45) 70%, rgba(18, 10, 24, 0.95) 100%);
   border-color: #ff3377;
-  box-shadow: 0 0 42px rgba(255, 0, 85, 0.95), inset 0 0 26px rgba(255, 0, 85, 0.8);
+  box-shadow: 0 0 36px rgba(255, 0, 85, 0.9), inset 0 0 24px rgba(255, 0, 85, 0.7);
 }
 
 #btn-fire .touch-btn-icon {
-  font-size: 32px;
+  font-size: 28px;
 }
 
 #btn-fire .touch-btn-label {
   color: #ff3377;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
-  text-shadow: 0 0 8px rgba(255, 0, 85, 0.8);
+  text-shadow: 0 0 6px rgba(255, 0, 85, 0.8);
 }
 
-/* 左手側セカンダリ射撃ボタン (3本指・4本指スタイル用) */
-#btn-left-fire {
-  position: absolute;
-  top: calc(70px + var(--safe-top));
-  left: calc(18px + var(--safe-left));
-  width: 54px;
-  height: 54px;
-  border-color: rgba(255, 0, 85, 0.55);
-  box-shadow: 0 0 16px rgba(255, 0, 85, 0.35);
-  z-index: 60;
-}
 
-#btn-left-fire:active, #btn-left-fire.pressed {
-  border-color: #ff0055;
-  background: rgba(255, 0, 85, 0.4);
-}
 
-#btn-left-fire .touch-btn-label {
-  color: #ff0055;
-}
-
-/* ADS / 精密照準ボタン (射撃ボタンの斜め左上) */
-#btn-ads {
-  position: absolute;
-  bottom: calc(118px + var(--safe-bottom));
-  right: calc(114px + var(--safe-right));
-  width: 60px;
-  height: 60px;
-  border-color: rgba(0, 243, 255, 0.7);
-  z-index: 55;
-}
-
-#btn-ads.toggled {
-  border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.3);
-  box-shadow: 0 0 26px rgba(255, 215, 0, 0.7), inset 0 0 14px rgba(255, 215, 0, 0.5);
-}
-
-#btn-ads.toggled .touch-btn-label {
-  color: #ffd700;
-}
-
-/* ジャンプボタン (射撃ボタンの真上) */
+/* ジャンプボタン (射撃ボタンのすぐ上) */
 #btn-jump {
   position: absolute;
-  bottom: calc(122px + var(--safe-bottom));
-  right: calc(18px + var(--safe-right));
-  width: 60px;
-  height: 60px;
-  border-color: rgba(0, 255, 136, 0.7);
-  z-index: 55;
+  bottom: calc(108px + var(--safe-bottom));
+  right: calc(16px + var(--safe-right));
+  width: 52px;
+  height: 52px;
+  border-color: rgba(0, 255, 136, 0.65);
+  z-index: 72;
 }
 
 #btn-jump:active, #btn-jump.pressed {
   border-color: var(--neon-green);
-  background: rgba(0, 255, 136, 0.35);
+  background: rgba(0, 255, 136, 0.3);
 }
 
 #btn-jump .touch-btn-label {
@@ -318,43 +272,64 @@ html, body, #app {
 /* スライディング / しゃがみボタン (射撃ボタンのすぐ左) */
 #btn-crouch {
   position: absolute;
-  bottom: calc(20px + var(--safe-bottom));
-  right: calc(122px + var(--safe-right));
-  width: 56px;
-  height: 56px;
-  border-color: rgba(255, 183, 3, 0.7);
-  z-index: 55;
+  bottom: calc(16px + var(--safe-bottom));
+  right: calc(106px + var(--safe-right));
+  width: 48px;
+  height: 48px;
+  border-color: rgba(255, 183, 3, 0.65);
+  z-index: 72;
 }
 
 #btn-crouch:active, #btn-crouch.pressed {
   border-color: var(--neon-amber);
-  background: rgba(255, 183, 3, 0.35);
+  background: rgba(255, 183, 3, 0.3);
 }
 
 #btn-crouch .touch-btn-label {
   color: var(--neon-amber);
 }
 
-/* リロードボタン (ジャンプの上) */
-#btn-reload {
+/* ADS / 精密照準ボタン (射撃ボタンの斜め左上) */
+#btn-ads {
   position: absolute;
-  bottom: calc(194px + var(--safe-bottom));
-  right: calc(24px + var(--safe-right));
+  bottom: calc(92px + var(--safe-bottom));
+  right: calc(92px + var(--safe-right));
   width: 50px;
   height: 50px;
-  border-color: rgba(0, 243, 255, 0.6);
-  z-index: 55;
+  border-color: rgba(0, 243, 255, 0.65);
+  z-index: 72;
 }
 
-/* 戦術手榴弾ボタン */
+#btn-ads.toggled {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.28);
+  box-shadow: 0 0 22px rgba(255, 215, 0, 0.65), inset 0 0 12px rgba(255, 215, 0, 0.45);
+}
+
+#btn-ads.toggled .touch-btn-label {
+  color: #ffd700;
+}
+
+/* リロードボタン (ジャンプのすぐ上) */
+#btn-reload {
+  position: absolute;
+  bottom: calc(170px + var(--safe-bottom));
+  right: calc(18px + var(--safe-right));
+  width: 44px;
+  height: 44px;
+  border-color: rgba(0, 243, 255, 0.55);
+  z-index: 72;
+}
+
+/* 戦術手榴弾ボタン (リロードの左) */
 #btn-grenade {
   position: absolute;
-  bottom: calc(192px + var(--safe-bottom));
-  right: calc(88px + var(--safe-right));
-  width: 48px;
-  height: 48px;
-  border-color: rgba(255, 80, 0, 0.7);
-  z-index: 55;
+  bottom: calc(168px + var(--safe-bottom));
+  right: calc(74px + var(--safe-right));
+  width: 42px;
+  height: 42px;
+  border-color: rgba(255, 80, 0, 0.65);
+  z-index: 72;
 }
 
 #btn-grenade .badge-count {
@@ -363,75 +338,74 @@ html, body, #app {
   right: -4px;
   background: #ff5500;
   color: #fff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
-  padding: 1px 5px;
-  border-radius: 8px;
+  padding: 1px 4px;
+  border-radius: 6px;
   border: 1px solid #fff;
 }
 
 /* バレットタイム / アドレナリンボタン */
 #btn-bullet-time {
   position: absolute;
-  bottom: calc(186px + var(--safe-bottom));
-  right: calc(152px + var(--safe-right));
-  width: 48px;
-  height: 48px;
-  border-color: rgba(255, 215, 0, 0.7);
-  z-index: 55;
+  bottom: calc(158px + var(--safe-bottom));
+  right: calc(126px + var(--safe-right));
+  width: 42px;
+  height: 42px;
+  border-color: rgba(255, 215, 0, 0.65);
+  z-index: 72;
 }
 
 /* Top System Buttons (Pause & Fullscreen) */
 .mobile-top-actions {
   position: absolute;
-  top: calc(10px + var(--safe-top));
-  left: calc(14px + var(--safe-left));
+  top: calc(8px + var(--safe-top));
+  left: calc(10px + var(--safe-left));
   display: flex;
-  gap: 10px;
-  z-index: 60;
-  pointer-events: auto;
+  gap: 8px;
+  z-index: 80;
+  pointer-events: auto !important;
 }
 
 .mobile-sys-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  background: rgba(8, 14, 28, 0.88);
-  border: 1.5px solid rgba(0, 243, 255, 0.5);
+  background: rgba(8, 14, 28, 0.85);
+  border: 1.5px solid rgba(0, 243, 255, 0.45);
   color: var(--neon-cyan);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: auto !important;
 }
 
 .mobile-sys-btn:active {
-  background: rgba(0, 243, 255, 0.4);
+  background: rgba(0, 243, 255, 0.35);
   transform: scale(0.92);
 }
 
-/* Hide fallback quick switcher if present */
-#mobile-weapon-bar {
-  display: none !important;
-}
+/* ================= FULL PC HUD - MOBILE SLIM & ERGONOMIC LAYOUT ================= */
 
-/* ================= FULL PC HUD COMPLETE RESTORATION ON MOBILE ================= */
-
-/* 1. HUD TOP (ウェーブ・スコア・連続キル・目標・EX高度) */
+/* 1. HUD TOP (ウェーブ・スコア・連続キル・目標・EX高度) - 上部中央にスリム配置 */
 #hud-top {
   position: absolute !important;
-  top: calc(8px + var(--safe-top)) !important;
-  left: calc(110px + var(--safe-left)) !important;
+  top: calc(6px + var(--safe-top)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) scale(0.85) !important;
+  transform-origin: top center !important;
   display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
-  z-index: 30 !important;
-  max-width: 45vw !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  align-items: center !important;
+  z-index: 50 !important;
   pointer-events: none !important;
+  width: auto !important;
 }
 
 .hud-top-row {
@@ -441,207 +415,212 @@ html, body, #app {
 
 #hud-top .hud-panel {
   padding: 3px 8px !important;
-  background: rgba(8, 14, 28, 0.75) !important;
+  background: rgba(8, 14, 28, 0.7) !important;
   border-radius: 6px !important;
-  border: 1px solid rgba(0, 243, 255, 0.3) !important;
+  border: 1px solid rgba(0, 243, 255, 0.25) !important;
 }
 
 #hud-top .hud-label {
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 #hud-top .hud-value-large {
-  font-size: 16px !important;
+  font-size: 15px !important;
   line-height: 1 !important;
 }
 
 #hud-top .hud-value-medium {
-  font-size: 14px !important;
+  font-size: 13px !important;
   line-height: 1 !important;
 }
 
 #hud-streak-val {
   display: block !important;
-  font-size: 10px !important;
+  font-size: 9px !important;
   color: var(--neon-amber) !important;
 }
 
 .hud-enemies-status {
-  font-size: 11px !important;
+  font-size: 10px !important;
 }
 
 .progress-bar-bg {
-  width: 140px !important;
-  height: 5px !important;
+  width: 90px !important;
+  height: 4px !important;
 }
 
 /* 2. HUD TOP RIGHT (兵装強化ステータスバッジ ＆ レーダーミニマップ) */
 #hud-top-right {
   position: absolute !important;
-  top: calc(8px + var(--safe-top)) !important;
-  right: calc(12px + var(--safe-right)) !important;
+  top: calc(6px + var(--safe-top)) !important;
+  right: calc(10px + var(--safe-right)) !important;
   display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  gap: 8px !important;
-  z-index: 30 !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 4px !important;
+  z-index: 50 !important;
   pointer-events: none !important;
 }
 
-/* 兵装強化ステータスバッジの完全表示 */
+#minimap-container {
+  width: 82px !important;
+  height: 82px !important;
+  background: rgba(8, 14, 28, 0.75) !important;
+}
+
+#minimap-canvas {
+  width: 82px !important;
+  height: 82px !important;
+}
+
+#minimap-container .minimap-header {
+  font-size: 7.5px !important;
+  padding: 1px 3px !important;
+}
+
+/* 兵装強化ステータスバッジ: 縦長ボックスを廃止し、ミニマップ下に極小ピル型で横並び！ */
 #hud-upgrades-bar {
   display: flex !important;
   flex-direction: column !important;
-  gap: 2px !important;
-  padding: 4px 8px !important;
-  background: rgba(8, 14, 28, 0.72) !important;
-  border: 1px solid rgba(0, 243, 255, 0.25) !important;
-  border-radius: 6px !important;
-  max-width: 180px !important;
+  gap: 1px !important;
+  padding: 2px 4px !important;
+  background: rgba(6, 12, 24, 0.5) !important;
+  border: 1px solid rgba(0, 243, 255, 0.2) !important;
+  border-radius: 4px !important;
+  max-width: 140px !important;
 }
 
 #hud-upgrades-bar .hud-label {
-  font-size: 8px !important;
-  color: var(--neon-cyan) !important;
-  margin-bottom: 2px !important;
+  display: none !important; /* ラベルを非表示にして省スペース化 */
 }
 
 .upgrade-badges-row {
   display: flex !important;
   flex-wrap: wrap !important;
-  gap: 3px !important;
+  justify-content: flex-end !important;
+  gap: 2px !important;
 }
 
 .upgrade-badge {
-  font-size: 9px !important;
-  padding: 1px 4px !important;
-  border-radius: 4px !important;
+  font-size: 7.5px !important;
+  padding: 1px 3px !important;
+  border-radius: 3px !important;
+  line-height: 1.1 !important;
   white-space: nowrap !important;
 }
 
-#minimap-container {
-  width: 94px !important;
-  height: 94px !important;
-  background: rgba(8, 14, 28, 0.8) !important;
-}
-
-#minimap-canvas {
-  width: 94px !important;
-  height: 94px !important;
-}
-
-#minimap-container .minimap-header {
-  font-size: 8px !important;
-  padding: 1px 3px !important;
-}
-
-/* 3. HUD BOTTOM LEFT (サイバーシールド・HP・スタミナ・バレットタイム) */
+/* 3. HUD BOTTOM LEFT (サイバーシールド・HP・スタミナ・バレットタイム) - 左下隅に極小スリム化 */
 #hud-bottom-left {
   position: absolute !important;
-  bottom: calc(10px + var(--safe-bottom)) !important;
-  left: calc(12px + var(--safe-left)) !important;
-  max-width: 165px !important;
-  z-index: 30 !important;
-  pointer-events: none !important;
+  bottom: calc(8px + var(--safe-bottom)) !important;
+  left: calc(10px + var(--safe-left)) !important;
+  max-width: 135px !important;
+  z-index: 50 !important;
+  pointer-events: auto !important;
+  transform: scale(0.85) !important;
+  transform-origin: bottom left !important;
 }
 
 .vitals-panel {
-  padding: 5px 8px !important;
-  background: rgba(8, 14, 28, 0.75) !important;
-  border-radius: 8px !important;
-  border: 1px solid rgba(0, 243, 255, 0.25) !important;
+  padding: 4px 6px !important;
+  background: rgba(8, 14, 28, 0.7) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 243, 255, 0.2) !important;
 }
 
 .vital-name {
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 .vital-num {
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 .bar-track {
-  height: 5px !important;
+  height: 4px !important;
 }
 
-/* 4. HUD BOTTOM RIGHT (全6種兵装スロット ＆ 弾薬メインパネル ＆ ピップスゲージ) の完全復活 */
+/* 4. HUD BOTTOM RIGHT (武器スロット ＆ 弾薬パネル) - 画面最下部中央に配置し、右下ボタンとの干渉を完全解消 */
 #hud-bottom-right {
   position: absolute !important;
-  bottom: calc(8px + var(--safe-bottom)) !important;
-  right: calc(208px + var(--safe-right)) !important;
+  bottom: calc(6px + var(--safe-bottom)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) scale(0.82) !important;
+  transform-origin: bottom center !important;
   display: flex !important;
-  flex-direction: column !important;
+  flex-direction: row !important;
   align-items: flex-end !important;
-  gap: 4px !important;
-  z-index: 35 !important;
+  gap: 6px !important;
+  z-index: 75 !important; /* Higher than aim-zone so weapon switching ALWAYS works */
   pointer-events: auto !important;
-  transform: scale(0.88) !important;
-  transform-origin: bottom right !important;
 }
 
 .weapon-slots-container {
   display: flex !important;
   flex-direction: column !important;
-  gap: 3px !important;
+  gap: 2px !important;
+  pointer-events: auto !important;
 }
 
 .weapon-slots-row {
   display: flex !important;
-  gap: 3px !important;
+  gap: 2px !important;
 }
 
 .weapon-slot {
   pointer-events: auto !important;
   cursor: pointer !important;
-  padding: 2px 6px !important;
-  font-size: 10px !important;
-  background: rgba(8, 14, 28, 0.82) !important;
-  border: 1px solid rgba(0, 243, 255, 0.35) !important;
+  padding: 3px 6px !important;
+  font-size: 9.5px !important;
+  background: rgba(8, 14, 28, 0.85) !important;
+  border: 1px solid rgba(0, 243, 255, 0.4) !important;
   border-radius: 4px !important;
+  white-space: nowrap !important;
+  touch-action: manipulation !important;
 }
 
 .weapon-slot:active {
-  background: rgba(0, 243, 255, 0.3) !important;
+  background: rgba(0, 243, 255, 0.35) !important;
   border-color: var(--neon-cyan) !important;
+  transform: scale(0.95) !important;
 }
 
 .weapon-slot.active {
   border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.5) !important;
+  background: rgba(0, 243, 255, 0.18) !important;
 }
 
 .ammo-panel {
   pointer-events: auto !important;
   cursor: pointer !important;
-  padding: 4px 8px !important;
+  padding: 3px 8px !important;
   background: rgba(8, 14, 28, 0.85) !important;
   border: 1px solid rgba(0, 243, 255, 0.35) !important;
   border-radius: 6px !important;
-  min-width: 150px !important;
+  min-width: 120px !important;
 }
 
 .ammo-header {
-  font-size: 11px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
+  font-size: 10px !important;
 }
 
 .ammo-readout {
-  font-size: 18px !important;
+  font-size: 16px !important;
 }
 
 .ammo-canvas-display {
   display: block !important;
-  width: 150px !important;
-  height: 14px !important;
+  width: 120px !important;
+  height: 10px !important;
 }
 
 /* Boss HUD on Mobile */
 .boss-hud-container {
-  top: calc(48px + var(--safe-top)) !important;
-  width: 65vw !important;
-  max-width: 420px !important;
+  top: calc(44px + var(--safe-top)) !important;
+  width: 60vw !important;
+  max-width: 380px !important;
+  transform: scale(0.9) !important;
 }
 
 /* Crosshair */

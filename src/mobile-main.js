@@ -23,7 +23,6 @@ class MobileCyberStrikeApp {
       joystickStick: document.getElementById('joystick-stick'),
       aimZone: document.getElementById('aim-zone'),
       btnFire: document.getElementById('btn-fire'),
-      btnLeftFire: document.getElementById('btn-left-fire'),
       btnAds: document.getElementById('btn-ads'),
       btnJump: document.getElementById('btn-jump'),
       btnCrouch: document.getElementById('btn-crouch'),
@@ -60,49 +59,53 @@ class MobileCyberStrikeApp {
   }
 
   setupWeaponSlotsTouch() {
+    const bindSlotTouch = (el, onTrigger) => {
+      if (!el) return;
+      let handled = false;
+      const trigger = (e) => {
+        if (handled) return;
+        handled = true;
+        setTimeout(() => { handled = false; }, 200);
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        onTrigger();
+      };
+      el.addEventListener('touchstart', trigger, { passive: false });
+      el.addEventListener('pointerdown', trigger, { passive: false });
+      el.addEventListener('click', trigger);
+    };
+
     // Direct touch support for weapon slots 1-6
     for (let i = 1; i <= 6; i++) {
       const slot = document.getElementById(`slot-${i}`);
-      if (slot) {
-        slot.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (this.game && this.game.player) {
-            this.game.player.switchWeapon(i - 1);
-            const w = this.game.player.activeWeapon;
-            if (this.game.hud) {
-              this.game.hud.showPickupToast(`【兵装切替】[${i}] ${w.displayName || w.name}`, 'supply');
-            }
+      bindSlotTouch(slot, () => {
+        if (this.game && this.game.player) {
+          this.game.player.switchWeapon(i - 1);
+          const w = this.game.player.activeWeapon;
+          if (this.game.hud) {
+            this.game.hud.showPickupToast(`【兵装切替】[${i}] ${w.displayName || w.name}`, 'supply');
           }
-        }, { passive: false });
-      }
+        }
+      });
     }
 
     // Direct touch support for Grenade slot
     const slotGrenade = document.getElementById('slot-grenade');
-    if (slotGrenade) {
-      slotGrenade.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (this.game && this.game.state === 'PLAYING') {
-          if (!this.game.player.throwGrenade(this.game.grenades)) {
-            this.game.hud.showPickupToast('手榴弾の残弾がありません！', 'supply');
-          }
+    bindSlotTouch(slotGrenade, () => {
+      if (this.game && this.game.state === 'PLAYING') {
+        if (!this.game.player.throwGrenade(this.game.grenades)) {
+          this.game.hud.showPickupToast('手榴弾の残弾がありません！', 'supply');
         }
-      }, { passive: false });
-    }
+      }
+    });
 
     // Direct touch support for Ammo panel (tap to reload)
     const ammoPanel = document.querySelector('.ammo-panel');
-    if (ammoPanel) {
-      ammoPanel.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (this.game && this.game.player && this.game.player.activeWeapon) {
-          this.game.player.activeWeapon.reload();
-        }
-      }, { passive: false });
-    }
+    bindSlotTouch(ammoPanel, () => {
+      if (this.game && this.game.player && this.game.player.activeWeapon) {
+        this.game.player.activeWeapon.reload();
+      }
+    });
   }
 
   bindMobileSettings() {
