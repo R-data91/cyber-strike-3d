@@ -83,34 +83,48 @@ export class AudioManager {
 
   async loadAudioSamples() {
     const files = {
-      rifle: './sounds/rifle.wav',
-      ak47: './sounds/ak47.wav',
-      shotgun: './sounds/shotgun.wav',
-      sniper: './sounds/sniper.wav',
-      bounce: './sounds/bounce.wav',
+      rifle: 'rifle.wav',
+      ak47: 'ak47.wav',
+      shotgun: 'shotgun.wav',
+      sniper: 'sniper.wav',
+      bounce: 'bounce.wav',
     };
 
-    for (const [key, url] of Object.entries(files)) {
+    // Calculate candidate path prefixes for root and /mobile/ routes
+    const candidatePrefixes = [
+      './sounds/',
+      '../sounds/',
+      '/sounds/',
+      window.location.origin + '/sounds/',
+    ];
+
+    const fetchSample = async (filename) => {
+      for (const prefix of candidatePrefixes) {
+        try {
+          const res = await fetch(prefix + filename);
+          if (res.ok) {
+            const arrayBuffer = await res.arrayBuffer();
+            return await this.ctx.decodeAudioData(arrayBuffer);
+          }
+        } catch (e) {}
+      }
+      return null;
+    };
+
+    for (const [key, filename] of Object.entries(files)) {
       try {
-        const res = await fetch(url);
-        if (res.ok) {
-          const arrayBuffer = await res.arrayBuffer();
-          this.buffers[key] = await this.ctx.decodeAudioData(arrayBuffer);
-        }
+        const buf = await fetchSample(filename);
+        if (buf) this.buffers[key] = buf;
       } catch (err) {
-        console.warn(`Could not load ${url}:`, err);
+        console.warn(`Could not load sample ${filename}:`, err);
       }
     }
 
     // Load footsteps step1 ~ step4
     for (let i = 1; i <= 4; i++) {
       try {
-        const res = await fetch(`./sounds/step${i}.wav`);
-        if (res.ok) {
-          const arrayBuffer = await res.arrayBuffer();
-          const buf = await this.ctx.decodeAudioData(arrayBuffer);
-          this.buffers.steps.push(buf);
-        }
+        const buf = await fetchSample(`step${i}.wav`);
+        if (buf) this.buffers.steps.push(buf);
       } catch (err) {
         console.warn(`Could not load step${i}.wav:`, err);
       }
@@ -144,6 +158,36 @@ export class AudioManager {
     }
   }
 
+  // Reusable procedural noise burst for weapon punch and explosion fallbacks
+  playNoiseBurst(duration = 0.08, volume = 0.5, cutoff = 2400, filterType = 'lowpass') {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const bufferSize = Math.max(1, Math.floor(this.ctx.sampleRate * duration));
+    const noiseBuf = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noiseSource = this.ctx.createBufferSource();
+    noiseSource.buffer = noiseBuf;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = filterType;
+    filter.frequency.setValueAtTime(cutoff, t);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(volume, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + duration);
+
+    noiseSource.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.sfxGain);
+
+    noiseSource.start(t);
+    noiseSource.stop(t + duration);
+  }
+
   playSample(buffer, volume = 1.0, pitchVariation = 0.04, dest = this.sfxGain) {
     if (!this.ctx || !buffer) return;
 
@@ -168,31 +212,82 @@ export class AudioManager {
   }
 
   /**
-   * 1. AK-47 銃声 (7.62x39mm 実銃発射音)
+   * 1. AK-47 銃声 (7.62x39mm 実銃発射音 ＋ プロシージャル合成フォールバック)
    */
   playRifleShot() {
     const buf = this.buffers.ak47 || this.buffers.rifle;
     if (buf) {
       this.playSample(buf, 1.45, 0.06);
+      return;
     }
+    // High-impact 7.62mm procedural assault rifle crack
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const oscGain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, t);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 0.07);
+    oscGain.gain.setValueAtTime(0.85, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.075);
+    osc.connect(oscGain);
+    oscGain.connect(this.sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.08);
+
+    this.playNoiseBurst(0.08, 0.7, 2800);
   }
 
   /**
-   * 2. ショットガン銃声 (12ゲージ・タクティカルショットガン)
+   * 2. ショットガン銃声 (12ゲージ・タクティカル散弾 ＋ 合成フォールバック)
    */
   playShotgunShot() {
     if (this.buffers.shotgun) {
       this.playSample(this.buffers.shotgun, 1.55, 0.04);
+      return;
     }
+    // Heavy 12-gauge blast procedural fallback
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const oscGain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(90, t);
+    osc.frequency.exponentialRampToValueAtTime(25, t + 0.16);
+    oscGain.gain.setValueAtTime(1.1, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+    osc.connect(oscGain);
+    oscGain.connect(this.sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.18);
+
+    this.playNoiseBurst(0.14, 0.9, 1800);
   }
 
   /**
-   * 3. 対物スナイパー / レールガン銃声 (.50 BMG 大口径砲撃音)
+   * 3. 対物スナイパー / レールガン銃声 (.50 BMG 大口径砲撃音 ＋ 合成フォールバック)
    */
   playRailgunShot() {
     if (this.buffers.sniper) {
       this.playSample(this.buffers.sniper, 1.65, 0.03);
+      return;
     }
+    // .50 BMG Heavy Vortex Railgun blast procedural fallback
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const oscGain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(360, t);
+    osc.frequency.exponentialRampToValueAtTime(32, t + 0.26);
+    oscGain.gain.setValueAtTime(1.2, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.01, t + 0.28);
+    osc.connect(oscGain);
+    oscGain.connect(this.sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.28);
+
+    this.playNoiseBurst(0.20, 0.95, 3400);
   }
 
   /**

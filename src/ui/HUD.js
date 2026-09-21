@@ -66,6 +66,7 @@ export class HUD {
       document.getElementById('slot-6'),
     ];
     this.grenadeCount = document.getElementById('hud-grenade-count');
+    this.btnGrenadeCount = document.getElementById('btn-grenade-count');
     this.weaponName = document.getElementById('hud-current-weapon-name');
     this.fireMode = document.getElementById('hud-fire-mode');
     this.ammoCurrent = document.getElementById('hud-ammo-current');
@@ -504,6 +505,21 @@ export class HUD {
 
     if (this.grenadeCount) {
       setText(this.grenadeCount, `x${player.grenades}`);
+    }
+
+    if (this.btnGrenadeCount) {
+      const gCount = player.grenades;
+      setText(this.btnGrenadeCount, gCount.toString());
+      if (gCount >= 100) {
+        this.btnGrenadeCount.style.fontSize = '6.5px';
+        this.btnGrenadeCount.style.padding = '1px 2px';
+      } else if (gCount >= 10) {
+        this.btnGrenadeCount.style.fontSize = '7.5px';
+        this.btnGrenadeCount.style.padding = '1px 3px';
+      } else {
+        this.btnGrenadeCount.style.fontSize = '9px';
+        this.btnGrenadeCount.style.padding = '1px 4px';
+      }
     }
 
     // Low HP heartbeat vignette

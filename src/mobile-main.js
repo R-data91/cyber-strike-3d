@@ -52,8 +52,21 @@ class MobileCyberStrikeApp {
     // 6. Setup screen wake lock
     this.setupWakeLock();
 
-    // 7. Prevent accidental gestures (pinch-zoom, bounce scroll)
+    // 7. Setup Web Audio unlocking on first user touch gesture
+    this.setupAudioUnlock();
+
+    // 8. Prevent accidental gestures (pinch-zoom, bounce scroll)
     this.preventAccidentalGestures();
+  }
+
+  setupAudioUnlock() {
+    const unlock = () => {
+      if (this.game && this.game.audio) {
+        this.game.audio.resume();
+      }
+    };
+    window.addEventListener('touchstart', unlock, { passive: true });
+    window.addEventListener('pointerdown', unlock, { passive: true });
   }
 
   setupWeaponSlotsTouch() {
@@ -96,16 +109,6 @@ class MobileCyberStrikeApp {
         }
       });
     }
-
-    // Direct touch support for Grenade slot
-    const slotGrenade = document.getElementById('slot-grenade');
-    bindSlotTouch(slotGrenade, () => {
-      if (this.game && this.game.state === 'PLAYING') {
-        if (!this.game.player.throwGrenade(this.game.grenades)) {
-          this.game.hud.showPickupToast('手榴弾の残弾がありません！', 'supply');
-        }
-      }
-    });
 
     // Direct touch support for Ammo panel (tap to reload)
     const ammoPanel = document.querySelector('.ammo-panel');
