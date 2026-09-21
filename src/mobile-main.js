@@ -29,8 +29,6 @@ class MobileCyberStrikeApp {
       btnReload: document.getElementById('btn-reload'),
       btnGrenade: document.getElementById('btn-grenade'),
       btnBulletTime: document.getElementById('btn-bullet-time'),
-      btnWeaponPrev: document.getElementById('btn-weapon-prev'),
-      btnWeaponNext: document.getElementById('btn-weapon-next'),
       btnPause: document.getElementById('btn-pause'),
       btnFullscreen: document.getElementById('btn-fullscreen'),
     };

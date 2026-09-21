@@ -432,19 +432,6 @@ export class MobileInputManager {
       });
     }
 
-    // Quick Weapon Prev/Next Buttons
-    const btnWeaponPrev = this.dom.btnWeaponPrev;
-    const btnWeaponNext = this.dom.btnWeaponNext;
-    if (btnWeaponPrev) {
-      bindBtn(btnWeaponPrev, () => {
-        if (this.onWeaponSlotSelect) this.onWeaponSlotSelect('prev');
-      });
-    }
-    if (btnWeaponNext) {
-      bindBtn(btnWeaponNext, () => {
-        if (this.onWeaponSlotSelect) this.onWeaponSlotSelect('next');
-      });
-    }
 
     // Pause Button
     const btnPause = this.dom.btnPause;
