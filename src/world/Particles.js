@@ -324,43 +324,43 @@ export class ParticleSystem {
     let lightIntensity = 0;
 
     if (tierLevel === 1) {
-      // Lv.1: 通常紫電ビーム (細身)
-      innerRadius = 0.05;
-      outerRadius = 0.15;
+      // Lv.1: 通常紫電ビーム (極細・視界クリア)
+      innerRadius = 0.035;
+      outerRadius = 0.10;
       coreColor = 0xdf4df0;
       outerColor = 0x86198f;
     } else if (tierLevel === 2) {
-      // Lv.2: 帯電プラズマビーム (太さ2倍、シアン×マゼンタ)
+      // Lv.2: 帯電プラズマビーム (シアンブルー)
+      innerRadius = 0.055;
+      outerRadius = 0.16;
+      coreColor = 0x00f3ff;
+      outerColor = 0x0284c7;
+      ringCount = 1;
+      lightIntensity = 2;
+    } else if (tierLevel === 3) {
+      // Lv.3: ソーラーチャージビーム (黄金アンバー)
+      innerRadius = 0.08;
+      outerRadius = 0.24;
+      coreColor = 0xffea00;
+      outerColor = 0xd97706;
+      ringCount = 2;
+      lightIntensity = 3;
+    } else if (tierLevel === 4) {
+      // Lv.4: ネオンマゼンタ過熱光線
       innerRadius = 0.11;
       outerRadius = 0.32;
-      coreColor = 0x00f3ff;
-      outerColor = 0xd946ef;
-      ringCount = 1;
-      lightIntensity = 5;
-    } else if (tierLevel === 3) {
-      // Lv.3: 超高圧ソーラービーム (太さ3.5倍、黄金コア×シアン放電)
-      innerRadius = 0.20;
-      outerRadius = 0.55;
-      coreColor = 0xfff066;
+      coreColor = 0xff00aa;
+      outerColor = 0x8b5cf6;
+      ringCount = 2;
+      lightIntensity = 4;
+    } else {
+      // Lv.5: 神威白熱プリズム光線 (視界を遮らないスマートな太さに抑制・白熱核×極光シアン)
+      innerRadius = 0.15;
+      outerRadius = 0.44;
+      coreColor = 0xffffff;
       outerColor = 0x00f3ff;
       ringCount = 3;
-      lightIntensity = 12;
-    } else if (tierLevel === 4) {
-      // Lv.4: MAX OVERLOAD 破滅光線 (太さ6倍超、白熱純白核×極光シアン大気電離)
-      innerRadius = 0.32;
-      outerRadius = 0.85;
-      coreColor = 0xffffff;
-      outerColor = 0x00f3ff;
-      ringCount = 4;
-      lightIntensity = 20;
-    } else {
-      // Lv.5: 💥 GOD RAYS 神威極光線 (太さ9倍、神話級超極太コズミックレーザー)
-      innerRadius = 0.48;
-      outerRadius = 1.30;
-      coreColor = 0xffffff;
-      outerColor = 0x00ffff;
-      ringCount = 6;
-      lightIntensity = 30;
+      lightIntensity = 5;
     }
 
     // 1. コア光線
@@ -368,7 +368,7 @@ export class ParticleSystem {
     const coreMat = new THREE.MeshBasicMaterial({
       color: coreColor,
       transparent: true,
-      opacity: 0.96,
+      opacity: 0.95,
       blending: THREE.AdditiveBlending,
     });
     const coreMesh = new THREE.Mesh(coreGeo, coreMat);
@@ -376,12 +376,12 @@ export class ParticleSystem {
     coreMesh.quaternion.copy(orientation);
     this.scene.add(coreMesh);
 
-    // 2. 外郭プラズマオーラ
+    // 2. 外郭プラズマオーラ (視界阻害を避けるため不透明度を抑制)
     const outerGeo = new THREE.CylinderGeometry(outerRadius, outerRadius, distance, 8);
     const outerMat = new THREE.MeshBasicMaterial({
       color: outerColor,
       transparent: true,
-      opacity: tierLevel >= 3 ? 0.65 : 0.45,
+      opacity: tierLevel >= 4 ? 0.45 : 0.35,
       blending: THREE.AdditiveBlending,
     });
     const outerMesh = new THREE.Mesh(outerGeo, outerMat);
@@ -395,12 +395,12 @@ export class ParticleSystem {
       for (let r = 0; r < ringCount; r++) {
         const ringFraction = (r + 1) / (ringCount + 1);
         const ringPos = startPos.clone().lerp(endPos, ringFraction);
-        const ringRadius = outerRadius * (1.3 + r * 0.25);
+        const ringRadius = outerRadius * (1.2 + r * 0.2);
         const ringGeo = new THREE.RingGeometry(ringRadius * 0.7, ringRadius, 16);
         const ringMat = new THREE.MeshBasicMaterial({
           color: coreColor,
           transparent: true,
-          opacity: 0.85,
+          opacity: 0.6,
           side: THREE.DoubleSide,
           blending: THREE.AdditiveBlending,
         });
@@ -416,7 +416,7 @@ export class ParticleSystem {
     // 4. ダイナミックライト (Lv.2以上)
     let flashLight = null;
     if (lightIntensity > 0) {
-      flashLight = new THREE.PointLight(coreColor, lightIntensity, 25, 2);
+      flashLight = new THREE.PointLight(coreColor, lightIntensity, 12, 2);
       flashLight.position.copy(midPoint);
       this.scene.add(flashLight);
     }

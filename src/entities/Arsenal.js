@@ -1061,29 +1061,29 @@ export class NebulaBeamCannon extends Weapon {
   update(delta, isMoving, walkTime, isSliding) {
     super.update(delta, isMoving, walkTime, isSliding);
 
-    // 照射が途切れたら徐々に冷却
+    // 照射が途切れたら徐々に冷却 (自然なホールド感のため減衰を緩和)
     this.channelTimer -= delta;
     if (this.channelTimer <= 0) {
-      this.channelDuration = Math.max(0, this.channelDuration - delta * 2.2);
+      this.channelDuration = Math.max(0, this.channelDuration - delta * 1.5);
     }
-    this.beamHeat = Math.min(1.0, this.channelDuration / 1.5);
+    this.beamHeat = Math.min(1.0, this.channelDuration / 1.8);
 
-    // 5段階の威力判定 (Lv.1 〜 Lv.5)
-    if (this.channelDuration >= 2.0) {
+    // 5段階の威力判定 (Lv.1 〜 Lv.5): 表示枠肥大化防止のため名称を排除しレベルと倍率のみ表示
+    if (this.channelDuration >= 1.8) {
       this.currentTier = 5;
-      this.fireMode = '💥 GOD RAY Lv.5 [MAX] (3.8x)';
-    } else if (this.channelDuration >= 1.45) {
+      this.fireMode = 'Lv.5 [MAX] (4.0x)';
+    } else if (this.channelDuration >= 1.25) {
       this.currentTier = 4;
-      this.fireMode = '⚡ OVERLOAD Lv.4 (2.9x)';
-    } else if (this.channelDuration >= 0.85) {
+      this.fireMode = 'Lv.4 (3.0x)';
+    } else if (this.channelDuration >= 0.75) {
       this.currentTier = 3;
-      this.fireMode = '🔥 HYPER Lv.3 (2.1x)';
-    } else if (this.channelDuration >= 0.35) {
+      this.fireMode = 'Lv.3 (2.3x)';
+    } else if (this.channelDuration >= 0.30) {
       this.currentTier = 2;
-      this.fireMode = '⚡ CHARGE Lv.2 (1.5x)';
+      this.fireMode = 'Lv.2 (1.6x)';
     } else {
       this.currentTier = 1;
-      this.fireMode = 'BEAM Lv.1 (1.0x)';
+      this.fireMode = 'Lv.1 (1.0x)';
     }
 
     // エミッターリングの高速回転 & コア蓄電アニメーション
@@ -1157,8 +1157,8 @@ export class NebulaBeamCannon extends Weapon {
     this.audio.playBeamTick();
 
     // 連続照射時間 (チャネリング) の蓄積
-    this.channelTimer = 0.16;
-    this.channelDuration = Math.min(2.2, this.channelDuration + 0.08);
+    this.channelTimer = 0.22;
+    this.channelDuration = Math.min(3.0, this.channelDuration + 0.10);
 
     const rayDir = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
     raycaster.set(this.camera.position, rayDir);
@@ -1186,7 +1186,7 @@ export class NebulaBeamCannon extends Weapon {
       }
     });
 
-    // 照射時間による4段階のダメージ倍率 (1.0x -> 1.6x -> 2.3x -> 3.0x)
+    // 照射時間による4段階のダメージ倍率 (1.0x -> 1.6x -> 2.3x -> 3.0x -> 4.0x)
     // ネビュラビーム近傍ヒット判定 (初期値2.0倍基準: 0.80m)
     const beamTolerance = 0.80 + hitRangeBonus * 0.8; // 0.40 * 2.0 = 0.80
     const camPos = this.camera.position;
@@ -1210,17 +1210,17 @@ export class NebulaBeamCannon extends Weapon {
     }
 
     let rampMult = 1.0;
-    if (this.currentTier === 5) rampMult = 3.8;
-    else if (this.currentTier === 4) rampMult = 2.9;
-    else if (this.currentTier === 3) rampMult = 2.1;
-    else if (this.currentTier === 2) rampMult = 1.5;
+    if (this.currentTier === 5) rampMult = 4.0;
+    else if (this.currentTier === 4) rampMult = 3.0;
+    else if (this.currentTier === 3) rampMult = 2.3;
+    else if (this.currentTier === 2) rampMult = 1.6;
     else rampMult = 1.0;
 
     penetratingHits.forEach(h => {
       h.hit.rampMult = rampMult;
     });
 
-    // ユーザー要望: 5段階のビーム視覚演出を描画
+    // 5段階のビーム視覚演出を描画
     this.particles.createNebulaBeam(muzzleWorld, endPoint, this.currentTier, 0.09);
 
     if (wallHits.length > 0) {

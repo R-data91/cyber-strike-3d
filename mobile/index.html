@@ -238,6 +238,13 @@
         </div>
       </footer>
 
+      <!-- 無敵バリア持続インジケーター (武器エリアの上部にフロート配置) -->
+      <div id="invincible-indicator" class="invincible-indicator hidden">
+        <span class="inv-icon">🛡️</span>
+        <span class="inv-title">無敵バリア:</span>
+        <span id="invincible-timer-val" class="inv-timer">5.0s</span>
+      </div>
+
       <!-- 右下: 武器 & 弾薬ステータス (全6種兵装スロット ＆ 弾薬パネル) -->
       <footer id="hud-bottom-right">
         <!-- 武器スロット選択 (1~3と4~6+手榴弾の2行構成) -->
@@ -274,11 +281,6 @@
 
         <!-- 弾薬メインパネル -->
         <div class="ammo-panel">
-          <div id="invincible-indicator" class="invincible-indicator hidden">
-            <span class="inv-icon">🛡️</span>
-            <span class="inv-title">無敵バリア:</span>
-            <span id="invincible-timer-val" class="inv-timer">5.0s</span>
-          </div>
           <div class="ammo-header">
             <span id="hud-current-weapon-name">AK-47</span>
             <span id="hud-fire-mode" class="tag">フルオート</span>
@@ -510,7 +512,7 @@
             </button>
             <div class="pause-bottom-row">
               <button id="btn-restart-game" class="btn-cyber-secondary tiny-btn">最初から</button>
-              <button id="btn-toggle-perf-monitor" class="btn-cyber-secondary tiny-btn">📊 性能</button>
+              <button id="btn-toggle-perf-monitor" class="btn-cyber-secondary tiny-btn">📊 性能: OFF</button>
               <a href="../" class="btn-cyber-secondary tiny-btn">💻 PC版</a>
             </div>
           </div>

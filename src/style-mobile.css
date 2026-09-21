@@ -547,22 +547,22 @@ html, body, #app {
   top: calc(52px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   bottom: auto !important;
-  width: 132px !important;
-  max-width: 132px !important;
+  width: 160px !important;
+  max-width: 160px !important;
   z-index: 45 !important;
   pointer-events: none !important;
   transform: none !important;
 }
 
 #hud-bottom-left .vitals-panel {
-  padding: 3.5px 7px !important;
+  padding: 3.5px 8px !important;
   background: rgba(6, 12, 24, 0.84) !important;
   border-radius: 4px !important;
   border: 1px solid rgba(0, 243, 255, 0.3) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 2px !important;
-  width: 132px !important;
+  width: 160px !important;
   box-sizing: border-box !important;
 }
 
@@ -690,15 +690,38 @@ html, body, #app {
 
 .ammo-readout {
   font-size: 18px !important;
+  height: 22px !important;
   display: flex !important;
-  align-items: baseline !important;
+  align-items: center !important;
   gap: 4px !important;
+  overflow: hidden !important;
 }
 
 .ammo-current.reloading {
-  color: var(--neon-amber, #ffb703) !important;
-  font-size: 14px !important;
-  animation: blink 0.35s infinite alternate !important;
+  color: var(--neon-cyan) !important;
+  font-size: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.reload-spinner.tiny {
+  display: inline-block !important;
+  width: 12px !important;
+  height: 12px !important;
+  border: 2px solid rgba(0, 243, 255, 0.25) !important;
+  border-top-color: var(--neon-cyan) !important;
+  border-radius: 50% !important;
+  animation: spin 0.8s linear infinite !important;
+  vertical-align: middle !important;
+  margin-right: 4px !important;
+}
+
+.reload-text-inline {
+  font-size: 11px !important;
+  color: var(--neon-cyan) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  vertical-align: middle !important;
 }
 
 .ammo-canvas-display {
@@ -707,24 +730,51 @@ html, body, #app {
   height: 12px !important;
 }
 
-/* Boss HUD on Mobile: 画面中央上部からさらに下げてセンタリング・横幅1.2倍・文字縮小 */
+/* Boss HUD on Mobile: 画面中央上部からさらに下げて配置（ウェーブ表示直下）・1行目:警告+名前+HP数値 / 2行目:HPバー */
 #boss-hud-container, .boss-hud-container {
   position: absolute !important;
-  top: calc(64px + var(--safe-top)) !important;
+  top: calc(84px + var(--safe-top)) !important;
   left: 50% !important;
-  transform: translateX(-50%) scale(0.85) !important;
+  transform: translateX(-50%) !important;
   transform-origin: top center !important;
-  width: min(530px, 88vw) !important;
-  max-width: 88vw !important;
+  width: min(380px, 82vw) !important;
+  max-width: 82vw !important;
+  padding: 3px 8px !important;
+  gap: 2px !important;
   z-index: 85 !important;
+  background: rgba(12, 4, 8, 0.92) !important;
+  border-radius: 4px !important;
+}
+
+#boss-hud-container .boss-hud-info {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 6px !important;
+}
+
+#boss-hud-container .boss-badge {
+  font-size: 7.5px !important;
+  padding: 1px 4px !important;
+  letter-spacing: 1px !important;
 }
 
 #boss-hud-container .boss-name {
-  font-size: 11.5px !important;
+  font-size: 9.5px !important;
+  letter-spacing: 0.5px !important;
+  font-weight: 800 !important;
 }
 
 #boss-hud-container .boss-hp-text, #boss-hud-container .boss-shield-text {
-  font-size: 9px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #ffaa00 !important;
+}
+
+#boss-hud-container .boss-hp-track {
+  height: 5px !important;
+  border-radius: 2px !important;
 }
 
 /* ================= 照準レティクル (全画面/PWA 完全真円中心同期) ================= */
@@ -813,38 +863,203 @@ html, body, #app {
   pointer-events: none !important;
 }
 
-/* Mobile Start Modal Adjustments */
-.terminal-modal {
-  max-width: 92vw !important;
-  max-height: 88vh !important;
-  padding: 18px 20px !important;
-  overflow-y: auto !important;
-}
-
-.wide-dashboard {
+/* ================= Mobile Start & GameOver Modals (スクロール完全解消・横画面最適化) ================= */
+#start-screen .terminal-modal {
+  max-width: min(94vw, 760px) !important;
+  width: min(94vw, 760px) !important;
+  max-height: 96vh !important;
+  height: auto !important;
+  padding: 8px 18px !important;
+  overflow: hidden !important;
+  display: flex !important;
   flex-direction: column !important;
-  max-height: 38vh !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+#start-screen .game-badge {
+  font-size: 7.5px !important;
+  padding: 1px 6px !important;
+  margin-bottom: 1px !important;
+  letter-spacing: 0.5px !important;
+}
+
+#start-screen .game-title {
+  font-size: 18px !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+}
+
+#start-screen .game-subtitle {
+  font-size: 8.5px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.2 !important;
+}
+
+#start-screen .wide-dashboard {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  max-height: 25vh !important;
   overflow-y: auto !important;
+  margin-bottom: 4px !important;
 }
 
-.game-title {
-  font-size: 26px !important;
+#start-screen .briefing-box, #start-screen .cores-guide-box {
+  flex: 1 !important;
+  padding: 4px 8px !important;
+  background: rgba(4, 8, 16, 0.7) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(0, 243, 255, 0.2) !important;
 }
 
-.game-subtitle {
-  font-size: 11px !important;
-  margin-bottom: 12px !important;
+#start-screen .briefing-box h3, #start-screen .cores-guide-box h3 {
+  font-size: 9.5px !important;
+  margin: 0 0 2px 0 !important;
 }
 
-.start-settings-bar {
-  flex-wrap: wrap !important;
-  gap: 10px !important;
-  margin: 12px 0 !important;
+#start-screen .briefing-desc {
+  display: none !important;
 }
 
-.setting-item {
-  flex: 1 1 45% !important;
-  min-width: 140px !important;
+#start-screen .update-highlights {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5px !important;
+}
+
+#start-screen .update-item {
+  font-size: 7.5px !important;
+  line-height: 1.2 !important;
+  padding: 0 !important;
+}
+
+#start-screen .cores-list {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 2px 4px !important;
+}
+
+#start-screen .core-card {
+  padding: 2px 4px !important;
+  font-size: 7.5px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+#start-screen .core-info {
+  font-size: 7.5px !important;
+  line-height: 1.1 !important;
+}
+
+#start-screen .start-settings-bar {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 6px !important;
+  margin: 3px 0 !important;
+  padding: 3px 6px !important;
+  background: rgba(0, 243, 255, 0.05) !important;
+  border-radius: 4px !important;
+}
+
+#start-screen .start-settings-bar .setting-item {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+}
+
+#start-screen .start-settings-bar label {
+  font-size: 7.5px !important;
+  white-space: nowrap !important;
+}
+
+#start-screen .start-settings-bar .cyber-select {
+  font-size: 8px !important;
+  height: 20px !important;
+  padding: 1px 4px !important;
+}
+
+#start-screen .start-settings-bar input[type="range"] {
+  height: 4px !important;
+  margin: 1px 0 !important;
+}
+
+#start-screen #btn-start-game {
+  padding: 6px 16px !important;
+  font-size: 12.5px !important;
+}
+
+#start-screen #btn-start-custom-hud, #start-screen #btn-start-ex {
+  padding: 5px 10px !important;
+  font-size: 10px !important;
+}
+
+#start-screen .modal-footer-note {
+  font-size: 7.5px !important;
+  margin-top: 2px !important;
+  opacity: 0.7 !important;
+}
+
+/* Mobile Game Over Screen (スクロール完全解消) */
+#gameover-screen .terminal-modal {
+  max-width: min(92vw, 540px) !important;
+  width: min(92vw, 540px) !important;
+  max-height: 94vh !important;
+  padding: 10px 18px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+#gameover-screen #gameover-banner {
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+  margin-bottom: 2px !important;
+  letter-spacing: 1px !important;
+}
+
+#gameover-screen #gameover-title {
+  font-size: 18px !important;
+  margin: 2px 0 !important;
+  line-height: 1.1 !important;
+}
+
+#gameover-screen #gameover-desc {
+  font-size: 9px !important;
+  margin-bottom: 6px !important;
+}
+
+#gameover-screen .stats-summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 3px 8px !important;
+  margin-bottom: 6px !important;
+}
+
+#gameover-screen .stat-box {
+  padding: 3px 6px !important;
+}
+
+#gameover-screen .stat-label {
+  font-size: 7.5px !important;
+}
+
+#gameover-screen .stat-value {
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+}
+
+#gameover-screen .modal-btn-group {
+  margin-top: 6px !important;
+  gap: 8px !important;
+}
+
+#gameover-screen .modal-btn-group button, #gameover-screen .modal-btn-group a {
+  padding: 6px 14px !important;
+  font-size: 11.5px !important;
 }
 
 /* Gyro Switch toggle design */
@@ -852,16 +1067,16 @@ html, body, #app {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .toggle-checkbox {
   position: relative;
-  width: 44px;
-  height: 22px;
+  width: 36px;
+  height: 18px;
   -webkit-appearance: none;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 11px;
+  border-radius: 9px;
   border: 1px solid rgba(0, 243, 255, 0.4);
   outline: none;
   cursor: pointer;
@@ -877,36 +1092,36 @@ html, body, #app {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #fff;
   transition: transform 0.2s ease;
 }
 
 .toggle-checkbox:checked::before {
-  transform: translateX(22px);
+  transform: translateX(18px);
 }
 
-/* ================= 性能テレメトリモニタ (バイタル表示の直下余白十分確保・4列×2行表示・初期OFF対応) ================= */
+/* ================= 性能テレメトリモニタ (3列×3行グリッド・初期OFF対応) ================= */
 .perf-monitor-hud {
   position: absolute !important;
-  top: calc(134px + var(--safe-top)) !important;
+  top: calc(126px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   display: grid !important;
-  grid-template-columns: repeat(4, auto) !important;
-  gap: 2px 8px !important;
-  padding: 2.5px 8px !important;
-  font-size: 8px !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 2px 6px !important;
+  padding: 2.5px 6px !important;
+  font-size: 7.5px !important;
   background: rgba(6, 12, 22, 0.9) !important;
   border: 1px solid rgba(0, 243, 255, 0.35) !important;
   border-radius: 4px !important;
   z-index: 91 !important;
   pointer-events: none !important;
   white-space: nowrap !important;
-  width: auto !important;
-  min-width: 185px !important;
-  max-width: 225px !important;
+  width: 215px !important;
+  min-width: 215px !important;
+  max-width: 215px !important;
   box-sizing: border-box !important;
   transform: none !important;
 }
@@ -918,28 +1133,28 @@ html, body, #app {
 .perf-item {
   display: flex !important;
   align-items: center !important;
-  gap: 2.5px !important;
+  gap: 2px !important;
 }
 
 .perf-lbl {
-  font-size: 7.5px !important;
+  font-size: 7px !important;
   color: #64748b !important;
 }
 
 .perf-val {
-  font-size: 8px !important;
+  font-size: 7.5px !important;
   font-family: var(--font-mono) !important;
 }
 
-/* ================= ピックアップ通知トースト (2行性能モニタ直下・開始位置降下) ================= */
+/* ================= ピックアップ通知トースト (3行性能モニタ直下・開始位置降下) ================= */
 #pickup-toast-container {
   position: absolute !important;
-  top: calc(170px + var(--safe-top)) !important;
+  top: calc(186px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 3px !important;
-  max-height: calc(100vh - 180px) !important;
+  max-height: calc(100vh - 195px) !important;
   overflow: hidden !important;
   align-items: flex-start !important;
   pointer-events: none !important;
@@ -980,13 +1195,29 @@ html, body, #app {
   box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
 }
 
-.invincible-indicator {
+/* 無敵バリア表示 (武器関連セクションの中ではなく上に配置) */
+#invincible-indicator, .invincible-indicator {
+  position: absolute !important;
+  bottom: calc(68px + var(--safe-bottom)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 70 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  align-items: center !important;
   font-size: 9.5px !important;
-  padding: 3px 10px !important;
+  padding: 2.5px 10px !important;
   gap: 6px !important;
-  letter-spacing: 1px !important;
-  border-width: 1px !important;
+  letter-spacing: 0.5px !important;
+  background: rgba(8, 16, 32, 0.92) !important;
+  border: 1.5px solid #00f3ff !important;
+  box-shadow: 0 0 12px rgba(0, 243, 255, 0.6) !important;
+  border-radius: 4px !important;
   white-space: nowrap !important;
+}
+
+#invincible-indicator.hidden, .invincible-indicator.hidden {
+  display: none !important;
 }
 
 .inv-timer {
@@ -1306,11 +1537,19 @@ body.hud-editing .touch-action-group .touch-btn.custom-selected {
 }
 
 .pause-bottom-row .tiny-btn {
-  flex: 1 !important;
+  flex: 1 1 0% !important;
+  min-width: 76px !important;
   font-size: 10px !important;
-  padding: 6px 6px !important;
+  padding: 6px 4px !important;
   text-align: center !important;
   white-space: nowrap !important;
   text-decoration: none !important;
+  box-sizing: border-box !important;
+}
+
+#btn-toggle-perf-monitor {
+  min-width: 78px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
 }
 

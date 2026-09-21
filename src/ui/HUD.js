@@ -534,11 +534,17 @@ export class HUD {
     setText(this.weaponName, weapon.name);
     setText(this.fireMode, weapon.fireMode);
     if (weapon.isReloading) {
-      setText(this.ammoCurrent, 'RLD');
-      this.ammoCurrent.classList.add('reloading');
+      if (!this._isReloadingUi) {
+        this._isReloadingUi = true;
+        this.ammoCurrent.innerHTML = '<span class="reload-spinner tiny"></span><span class="reload-text-inline">リロード中...</span>';
+        this.ammoCurrent.classList.add('reloading');
+      }
     } else {
+      if (this._isReloadingUi) {
+        this._isReloadingUi = false;
+        this.ammoCurrent.classList.remove('reloading');
+      }
       setText(this.ammoCurrent, weapon.currentAmmo);
-      this.ammoCurrent.classList.remove('reloading');
     }
     setText(this.ammoReserve, weapon.reserveAmmo);
 

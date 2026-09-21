@@ -364,6 +364,13 @@ export class CyberStrikeGame {
 
     const togglePerfBtn = document.getElementById('btn-toggle-perf-monitor');
     if (togglePerfBtn) {
+      const perfHud = document.getElementById('perf-monitor-hud');
+      const isVisible = perfHud && !perfHud.classList.contains('hidden');
+      if (togglePerfBtn.classList.contains('tiny-btn')) {
+        togglePerfBtn.textContent = isVisible ? '📊 性能: ON' : '📊 性能: OFF';
+      } else {
+        togglePerfBtn.textContent = isVisible ? '📊 性能モニタ [ON / F3]' : '📊 性能モニタ [OFF / F3]';
+      }
       togglePerfBtn.addEventListener('click', () => {
         const shown = this.togglePerfMonitor();
         if (togglePerfBtn.classList.contains('tiny-btn')) {

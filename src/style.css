@@ -724,6 +724,26 @@ body, html {
   animation: spin 0.8s linear infinite;
 }
 
+.reload-spinner.tiny {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(0, 243, 255, 0.25);
+  border-top-color: var(--neon-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.reload-text-inline {
+  font-size: 13px;
+  color: var(--neon-cyan);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
@@ -1565,7 +1585,7 @@ kbd {
 /* ==================== RAID BOSS HEALTH BAR HUD (上部中央の空き領域へ配置＆スコア表示との重複解消) ==================== */
 #boss-hud-container {
   position: absolute;
-  top: 18px;
+  top: 78px;
   left: 50%;
   transform: translateX(-50%);
   width: 680px;
