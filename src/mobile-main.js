@@ -327,23 +327,42 @@ class MobileCyberStrikeApp {
     if (btnStartCustom) btnStartCustom.addEventListener('click', () => openEditor(startScreen));
     if (btnPauseCustom) btnPauseCustom.addEventListener('click', () => openEditor(pauseScreen));
 
-    if (btnSave) btnSave.addEventListener('click', () => closeEditor(true));
-    if (btnReset) btnReset.addEventListener('click', () => resetLayout());
+    const handleSave = (e) => {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      closeEditor(true);
+    };
+    const handleReset = (e) => {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      resetLayout();
+    };
 
-    // Click handler for custom chips
+    if (btnSave) {
+      btnSave.addEventListener('click', handleSave);
+      btnSave.addEventListener('pointerdown', handleSave);
+    }
+    if (btnReset) {
+      btnReset.addEventListener('click', handleReset);
+      btnReset.addEventListener('pointerdown', handleReset);
+    }
+
+    // Click & Pointer handler for custom chips
     const chipsBar = document.getElementById('hud-custom-chips-bar');
     if (chipsBar) {
-      chipsBar.addEventListener('click', (e) => {
+      const onSelectChip = (e) => {
         const chip = e.target.closest('.btn-custom-chip');
         if (!chip) return;
+        e.preventDefault();
+        e.stopPropagation();
         const targetDef = HUD_BUTTONS.find(b => b.id === chip.dataset.id);
         if (targetDef) selectButton(targetDef);
-      });
+      };
+      chipsBar.addEventListener('click', onSelectChip);
+      chipsBar.addEventListener('pointerdown', onSelectChip);
     }
 
     // Slider for scale
     if (slider) {
-      slider.addEventListener('input', (e) => {
+      const onSliderChange = (e) => {
         if (!selectedBtnDef) return;
         const scale = parseInt(e.target.value, 10);
         if (sizeDisplay) sizeDisplay.textContent = `${scale}%`;
@@ -358,7 +377,11 @@ class MobileCyberStrikeApp {
         currentLayout[selectedBtnDef.id].width = newW;
         currentLayout[selectedBtnDef.id].height = newH;
         currentLayout[selectedBtnDef.id].scale = scale;
-      });
+      };
+      slider.addEventListener('input', onSliderChange);
+      slider.addEventListener('change', onSliderChange);
+      slider.addEventListener('pointerdown', (e) => e.stopPropagation());
+      slider.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
     }
 
     // Touch & Pointer Drag for Buttons

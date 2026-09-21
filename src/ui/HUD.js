@@ -533,21 +533,25 @@ export class HUD {
     const weapon = player.activeWeapon;
     setText(this.weaponName, weapon.name);
     setText(this.fireMode, weapon.fireMode);
-    setText(this.ammoCurrent, weapon.currentAmmo);
+    if (weapon.isReloading) {
+      setText(this.ammoCurrent, 'RLD');
+      this.ammoCurrent.classList.add('reloading');
+    } else {
+      setText(this.ammoCurrent, weapon.currentAmmo);
+      this.ammoCurrent.classList.remove('reloading');
+    }
     setText(this.ammoReserve, weapon.reserveAmmo);
 
-    const isLowAmmo = weapon.currentAmmo <= Math.ceil(weapon.magazineSize * 0.25);
+    const isLowAmmo = !weapon.isReloading && weapon.currentAmmo <= Math.ceil(weapon.magazineSize * 0.25);
     if (isLowAmmo !== this._lastLowAmmoState) {
       this._lastLowAmmoState = isLowAmmo;
       if (isLowAmmo) this.ammoCurrent.classList.add('low-ammo');
       else this.ammoCurrent.classList.remove('low-ammo');
     }
 
-    // Reload indicator
-    if (weapon.isReloading !== this._lastReloadingState) {
-      this._lastReloadingState = weapon.isReloading;
-      if (weapon.isReloading) this.reloadIndicator.classList.remove('hidden');
-      else this.reloadIndicator.classList.add('hidden');
+    // Reload indicator (縦伸び防止のためインライン表示化し独立ブロックは常時非表示)
+    if (this.reloadIndicator) {
+      this.reloadIndicator.classList.add('hidden');
     }
 
     // Weapon slot highlights

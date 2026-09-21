@@ -344,15 +344,23 @@ export class ParticleSystem {
       coreColor = 0xfff066;
       outerColor = 0x00f3ff;
       ringCount = 3;
-      lightIntensity = 14;
-    } else {
+      lightIntensity = 12;
+    } else if (tierLevel === 4) {
       // Lv.4: MAX OVERLOAD 破滅光線 (太さ6倍超、白熱純白核×極光シアン大気電離)
-      innerRadius = 0.34;
-      outerRadius = 0.92;
+      innerRadius = 0.32;
+      outerRadius = 0.85;
       coreColor = 0xffffff;
       outerColor = 0x00f3ff;
-      ringCount = 5;
-      lightIntensity = 28;
+      ringCount = 4;
+      lightIntensity = 20;
+    } else {
+      // Lv.5: 💥 GOD RAYS 神威極光線 (太さ9倍、神話級超極太コズミックレーザー)
+      innerRadius = 0.48;
+      outerRadius = 1.30;
+      coreColor = 0xffffff;
+      outerColor = 0x00ffff;
+      ringCount = 6;
+      lightIntensity = 30;
     }
 
     // 1. コア光線
@@ -455,9 +463,9 @@ export class ParticleSystem {
     this.createBulletTracer(startPos, endPos, colorHex);
   }
 
-  // Enemy explosion
+  // Enemy explosion (同時撃破時のスタッター防止のため破片数を14に軽量化)
   createExplosion(position, colorHex = 0xff0055) {
-    const count = 28;
+    const count = 14;
     const pieces = [];
 
     const debrisGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
@@ -585,14 +593,14 @@ export class ParticleSystem {
     ring2.rotation.x = Math.PI / 2;
     this.scene.add(ring2);
 
-    // 3. 瞬間爆発閃光 (ダイナミックライト)
-    const flashLight = new THREE.PointLight(colorHex, 10.0 * scale, 28.0 * scale, 1.8);
+    // 3. 瞬間爆発閃光 (ダイナミックライト: 連打時のGPU負荷を抑制)
+    const flashLight = new THREE.PointLight(colorHex, 4.0 * scale, 16.0 * scale, 2.0);
     flashLight.position.copy(position);
     flashLight.position.y += 0.8;
     this.scene.add(flashLight);
 
-    // 4. 灼熱の飛び散る破片 (Shrapnel)
-    const shrapnelCount = 36;
+    // 4. 灼熱の飛び散る破片 (Shrapnel: 連打時のスタッター防止のため36から16に最適化)
+    const shrapnelCount = 16;
     const shrapnelPieces = [];
     const shrapnelGeo = new THREE.BoxGeometry(0.18 * scale, 0.18 * scale, 0.18 * scale);
     const shrapnelMat = new THREE.MeshStandardMaterial({

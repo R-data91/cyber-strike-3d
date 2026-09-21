@@ -49,9 +49,59 @@ const _sharedPickupGeoCache = {
   stripeAmmo: new THREE.BoxGeometry(0.8, 0.12, 0.52),
 };
 
+// 3D戦術アイテム用 共有マテリアルキャッシュ (同時撃破時のシェーダー再コンパイルおよびGC負荷を完全排除)
+const _sharedPickupMatCache = {
+  healthBox: new THREE.MeshStandardMaterial({ color: 0x111622, roughness: 0.35, metalness: 0.8, emissive: 0x00ff88, emissiveIntensity: 0.25 }),
+  healthCross: new THREE.MeshBasicMaterial({ color: 0x00ff88 }),
+  beamHealth: new THREE.MeshBasicMaterial({ color: 0x00ff88, transparent: true, opacity: 0.5 }),
+
+  shieldPrism: new THREE.MeshStandardMaterial({ color: 0x051d2e, roughness: 0.2, metalness: 0.9, emissive: 0x00f3ff, emissiveIntensity: 0.8 }),
+  shieldRing: new THREE.MeshBasicMaterial({ color: 0x00f3ff }),
+  beamShield: new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.7 }),
+
+  damageCore: new THREE.MeshStandardMaterial({ color: 0x220533, roughness: 0.2, metalness: 0.9, emissive: 0xd946ef, emissiveIntensity: 0.8 }),
+  damageRing: new THREE.MeshBasicMaterial({ color: 0xff44ee }),
+  beamDamage: new THREE.MeshBasicMaterial({ color: 0xd946ef, transparent: true, opacity: 0.6 }),
+
+  magCyl: new THREE.MeshStandardMaterial({ color: 0x241a06, roughness: 0.25, metalness: 0.85, emissive: 0xf59e0b, emissiveIntensity: 0.75 }),
+  magRing: new THREE.MeshBasicMaterial({ color: 0xfbbf24 }),
+  beamMag: new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.6 }),
+
+  fireRateCore: new THREE.MeshStandardMaterial({ color: 0x330900, roughness: 0.15, metalness: 0.9, emissive: 0xff3b00, emissiveIntensity: 0.85 }),
+  fireRateRing: new THREE.MeshBasicMaterial({ color: 0xff6600 }),
+  beamFireRate: new THREE.MeshBasicMaterial({ color: 0xff3b00, transparent: true, opacity: 0.7 }),
+
+  hitRangeCore: new THREE.MeshStandardMaterial({ color: 0x051a33, roughness: 0.2, metalness: 0.9, emissive: 0x00f3ff, emissiveIntensity: 0.85 }),
+  hitRangeRing1: new THREE.MeshBasicMaterial({ color: 0x00ffff }),
+  hitRangeRing2: new THREE.MeshBasicMaterial({ color: 0x38bdf8 }),
+  beamHitRange: new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.7 }),
+
+  speedTurb: new THREE.MeshStandardMaterial({ color: 0x0d2810, roughness: 0.2, metalness: 0.85, emissive: 0x22c55e, emissiveIntensity: 0.8 }),
+  speedRing: new THREE.MeshBasicMaterial({ color: 0x4ade80 }),
+  beamSpeed: new THREE.MeshBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.7 }),
+
+  dropRateCore: new THREE.MeshStandardMaterial({ color: 0x052e16, roughness: 0.15, metalness: 0.9, emissive: 0x10b981, emissiveIntensity: 0.85 }),
+  dropRateRing: new THREE.MeshBasicMaterial({ color: 0x34d399 }),
+  beamDropRate: new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.7 }),
+
+  doubleDropCore: new THREE.MeshStandardMaterial({ color: 0x332005, roughness: 0.15, metalness: 0.95, emissive: 0xfbbf24, emissiveIntensity: 0.9 }),
+  doubleDropRing: new THREE.MeshBasicMaterial({ color: 0xffd700 }),
+  beamDoubleDrop: new THREE.MeshBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.75 }),
+
+  invincibleStar: new THREE.MeshStandardMaterial({ color: 0x332800, roughness: 0.15, metalness: 0.95, emissive: 0xffd700, emissiveIntensity: 1.0 }),
+  invincibleHalo1: new THREE.MeshBasicMaterial({ color: 0xffea00 }),
+  invincibleHalo2: new THREE.MeshBasicMaterial({ color: 0xffc400 }),
+  beamInvincible: new THREE.MeshBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.8 }),
+
+  ammoBox: new THREE.MeshStandardMaterial({ color: 0x1d291b, roughness: 0.4, metalness: 0.7, emissive: 0x00f3ff, emissiveIntensity: 0.25 }),
+  ammoStripe: new THREE.MeshBasicMaterial({ color: 0xffcc00 }),
+  beamAmmo: new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.5 }),
+};
+
 function createCachedPickupMesh(geo, mat) {
   const m = new THREE.Mesh(geo, mat);
   m.userData.preserveGeometry = true;
+  m.userData.preserveMaterial = true;
   return m;
 }
 
@@ -316,7 +366,11 @@ export class CyberStrikeGame {
     if (togglePerfBtn) {
       togglePerfBtn.addEventListener('click', () => {
         const shown = this.togglePerfMonitor();
-        togglePerfBtn.textContent = shown ? '📊 性能モニタ [ON / F3]' : '📊 性能モニタ [OFF / F3]';
+        if (togglePerfBtn.classList.contains('tiny-btn')) {
+          togglePerfBtn.textContent = shown ? '📊 性能: ON' : '📊 性能: OFF';
+        } else {
+          togglePerfBtn.textContent = shown ? '📊 性能モニタ [ON / F3]' : '📊 性能モニタ [OFF / F3]';
+        }
       });
     }
 
@@ -818,8 +872,9 @@ export class CyberStrikeGame {
     const forwardX = -Math.sin(this.player.yaw);
     const forwardZ = -Math.cos(this.player.yaw);
     const centerAngle = Math.atan2(forwardX, forwardZ);
-    const spreadArc = Math.PI * 0.8;
-    const offset = ((index / (total - 1 || 1)) - 0.5) * spreadArc + (Math.random() - 0.5) * 0.2;
+    const spreadArc = (100 * Math.PI) / 180; // ユーザー要望: 144度から100度へ集約
+    const normIndex = total > 1 ? (index % total) / (total - 1) : 0.5;
+    const offset = (normIndex - 0.5) * spreadArc + (Math.random() - 0.5) * 0.1;
     const angle = centerAngle + offset;
     const spawnDist = 20 + Math.random() * 14;
 
@@ -856,8 +911,9 @@ export class CyberStrikeGame {
     const forwardX = -Math.sin(this.player.yaw);
     const forwardZ = -Math.cos(this.player.yaw);
     const centerAngle = Math.atan2(forwardX, forwardZ);
-    const spreadArc = Math.PI * 0.8;
-    const offset = ((index / (total - 1 || 1)) - 0.5) * spreadArc + (Math.random() - 0.5) * 0.2;
+    const spreadArc = (100 * Math.PI) / 180; // ユーザー要望: 144度から100度へ集約
+    const normIndex = total > 1 ? (index % total) / (total - 1) : 0.5;
+    const offset = (normIndex - 0.5) * spreadArc + (Math.random() - 0.5) * 0.1;
     const angle = centerAngle + offset;
     const spawnDist = 24 + Math.random() * 12;
 
@@ -958,7 +1014,7 @@ export class CyberStrikeGame {
     const aliveEnemies = this.enemies.filter(e => !e.isDead && !e.isDying);
     if (aliveEnemies.length === 0 && this.waveEnemiesSpawned >= this.totalWaveEnemies && this.waveState === 'IN_PROGRESS') {
       this.waveState = 'CLEARED';
-      this.waveIntermissionTimer = 4.0;
+      this.waveIntermissionTimer = 2.6; // ユーザー要望: 現在(4.0s)の1.5倍速く (4.0 / 1.5 = 2.67s)
       const waveBonus = this.wave * 500;
       this.score += waveBonus;
 
@@ -1091,302 +1147,143 @@ export class CyberStrikeGame {
     const pickupGroup = new THREE.Group();
 
     if (type === 'health') {
-      const boxMat = new THREE.MeshStandardMaterial({
-        color: 0x111622,
-        roughness: 0.35,
-        metalness: 0.8,
-        emissive: 0x00ff88,
-        emissiveIntensity: 0.25,
-      });
-      const box = createCachedPickupMesh(_sharedPickupGeoCache.boxHealth, boxMat);
+      const box = createCachedPickupMesh(_sharedPickupGeoCache.boxHealth, _sharedPickupMatCache.healthBox);
       pickupGroup.add(box);
 
-      const crossMat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
-      const c1 = createCachedPickupMesh(_sharedPickupGeoCache.cross1, crossMat);
-      const c2 = createCachedPickupMesh(_sharedPickupGeoCache.cross2, crossMat);
+      const c1 = createCachedPickupMesh(_sharedPickupGeoCache.cross1, _sharedPickupMatCache.healthCross);
+      const c2 = createCachedPickupMesh(_sharedPickupGeoCache.cross2, _sharedPickupMatCache.healthCross);
       pickupGroup.add(c1, c2);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x00ff88,
-        transparent: true,
-        opacity: 0.5,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam32, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam32, _sharedPickupMatCache.beamHealth);
       beam.position.y = 1.6;
       pickupGroup.add(beam);
     } else if (type === 'shield_core') {
       // サイバーシールドチャージャー (エレクトリックブルーの六角柱 + 2重リング)
-      const prismMat = new THREE.MeshStandardMaterial({
-        color: 0x051d2e,
-        roughness: 0.2,
-        metalness: 0.9,
-        emissive: 0x00f3ff,
-        emissiveIntensity: 0.8,
-      });
-      const prism = createCachedPickupMesh(_sharedPickupGeoCache.prism, prismMat);
+      const prism = createCachedPickupMesh(_sharedPickupGeoCache.prism, _sharedPickupMatCache.shieldPrism);
       pickupGroup.add(prism);
 
-      const ring1 = createCachedPickupMesh(
-        _sharedPickupGeoCache.ring40,
-        new THREE.MeshBasicMaterial({ color: 0x00f3ff })
-      );
+      const ring1 = createCachedPickupMesh(_sharedPickupGeoCache.ring40, _sharedPickupMatCache.shieldRing);
       ring1.rotation.x = Math.PI * 0.4;
       pickupGroup.add(ring1);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x00f3ff,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, _sharedPickupMatCache.beamShield);
       beam.position.y = 1.9;
       pickupGroup.add(beam);
     } else if (type === 'damage_core') {
       // 兵装威力増幅コア (紫色のクリスタル八面体コア + 回転リング)
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: 0x220533,
-        roughness: 0.2,
-        metalness: 0.9,
-        emissive: 0xd946ef,
-        emissiveIntensity: 0.8,
-      });
-      const core = createCachedPickupMesh(_sharedPickupGeoCache.octa32, coreMat);
+      const core = createCachedPickupMesh(_sharedPickupGeoCache.octa32, _sharedPickupMatCache.damageCore);
       pickupGroup.add(core);
 
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0xff44ee });
-      const ring = createCachedPickupMesh(_sharedPickupGeoCache.ring44, ringMat);
+      const ring = createCachedPickupMesh(_sharedPickupGeoCache.ring44, _sharedPickupMatCache.damageRing);
       ring.rotation.x = Math.PI * 0.35;
       pickupGroup.add(ring);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0xd946ef,
-        transparent: true,
-        opacity: 0.6,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, _sharedPickupMatCache.beamDamage);
       beam.position.y = 1.9;
       pickupGroup.add(beam);
     } else if (type === 'mag_core') {
       // 弾倉拡張モジュール (アンバー/ゴールドの高周波ドラムシリンダー)
-      const cylMat = new THREE.MeshStandardMaterial({
-        color: 0x241a06,
-        roughness: 0.25,
-        metalness: 0.85,
-        emissive: 0xf59e0b,
-        emissiveIntensity: 0.75,
-      });
-      const cyl = createCachedPickupMesh(_sharedPickupGeoCache.cyl24, cylMat);
+      const cyl = createCachedPickupMesh(_sharedPickupGeoCache.cyl24, _sharedPickupMatCache.magCyl);
       pickupGroup.add(cyl);
 
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-      const ring1 = createCachedPickupMesh(_sharedPickupGeoCache.ringCyl, ringMat);
+      const ring1 = createCachedPickupMesh(_sharedPickupGeoCache.ringCyl, _sharedPickupMatCache.magRing);
       ring1.position.y = 0.14;
-      const ring2 = createCachedPickupMesh(_sharedPickupGeoCache.ringCyl, ringMat);
+      const ring2 = createCachedPickupMesh(_sharedPickupGeoCache.ringCyl, _sharedPickupMatCache.magRing);
       ring2.position.y = -0.14;
       pickupGroup.add(ring1, ring2);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0xf59e0b,
-        transparent: true,
-        opacity: 0.6,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, _sharedPickupMatCache.beamMag);
       beam.position.y = 1.9;
       pickupGroup.add(beam);
     } else if (type === 'fire_rate_core') {
       // 連射加速コア (真紅／オレンジの高エネルギー六角柱コア + 加速リング)
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: 0x330900,
-        roughness: 0.15,
-        metalness: 0.9,
-        emissive: 0xff3b00,
-        emissiveIntensity: 0.85,
-      });
-      const core = createCachedPickupMesh(_sharedPickupGeoCache.cone26, coreMat);
+      const core = createCachedPickupMesh(_sharedPickupGeoCache.cone26, _sharedPickupMatCache.fireRateCore);
       pickupGroup.add(core);
 
-      const accRing = createCachedPickupMesh(
-        _sharedPickupGeoCache.ring44,
-        new THREE.MeshBasicMaterial({ color: 0xff6600 })
-      );
+      const accRing = createCachedPickupMesh(_sharedPickupGeoCache.ring44, _sharedPickupMatCache.fireRateRing);
       accRing.rotation.x = Math.PI * 0.4;
       pickupGroup.add(accRing);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0xff3b00,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, _sharedPickupMatCache.beamFireRate);
       beam.position.y = 2.0;
       pickupGroup.add(beam);
     } else if (type === 'hit_range_core') {
       // 攻撃範囲強化コア (シアン/ディープブルーの電磁集束八面体 + デュアルリング)
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: 0x051a33,
-        roughness: 0.2,
-        metalness: 0.9,
-        emissive: 0x00f3ff,
-        emissiveIntensity: 0.85,
-      });
-      const core = createCachedPickupMesh(_sharedPickupGeoCache.octa32, coreMat);
+      const core = createCachedPickupMesh(_sharedPickupGeoCache.octa32, _sharedPickupMatCache.hitRangeCore);
       pickupGroup.add(core);
 
-      const ring1 = createCachedPickupMesh(
-        _sharedPickupGeoCache.ring48,
-        new THREE.MeshBasicMaterial({ color: 0x00ffff })
-      );
+      const ring1 = createCachedPickupMesh(_sharedPickupGeoCache.ring48, _sharedPickupMatCache.hitRangeRing1);
       ring1.rotation.x = Math.PI * 0.3;
-      const ring2 = createCachedPickupMesh(
-        _sharedPickupGeoCache.ring38,
-        new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
-      );
+      const ring2 = createCachedPickupMesh(_sharedPickupGeoCache.ring38, _sharedPickupMatCache.hitRangeRing2);
       ring2.rotation.y = Math.PI * 0.35;
       pickupGroup.add(ring1, ring2);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x00f3ff,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, _sharedPickupMatCache.beamHitRange);
       beam.position.y = 2.0;
       pickupGroup.add(beam);
     } else if (type === 'speed_core') {
       // 機動ブースターコア (ネオンライムグリーンの高速推進タービン)
-      const turbMat = new THREE.MeshStandardMaterial({
-        color: 0x0d2810,
-        roughness: 0.2,
-        metalness: 0.85,
-        emissive: 0x22c55e,
-        emissiveIntensity: 0.8,
-      });
-      const turb = createCachedPickupMesh(_sharedPickupGeoCache.turbCyl, turbMat);
+      const turb = createCachedPickupMesh(_sharedPickupGeoCache.turbCyl, _sharedPickupMatCache.speedTurb);
       pickupGroup.add(turb);
 
-      const finRing = createCachedPickupMesh(
-        _sharedPickupGeoCache.finRing,
-        new THREE.MeshBasicMaterial({ color: 0x4ade80 })
-      );
+      const finRing = createCachedPickupMesh(_sharedPickupGeoCache.finRing, _sharedPickupMatCache.speedRing);
       finRing.rotation.x = Math.PI * 0.5;
       pickupGroup.add(finRing);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x22c55e,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, _sharedPickupMatCache.beamSpeed);
       beam.position.y = 2.0;
       pickupGroup.add(beam);
     } else if (type === 'drop_rate_core') {
       // ドロップ率強化コア (エメラルドグリーンの正十二面体 + クォンタムリング)
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: 0x052e16,
-        roughness: 0.15,
-        metalness: 0.9,
-        emissive: 0x10b981,
-        emissiveIntensity: 0.85,
-      });
-      const core = createCachedPickupMesh(_sharedPickupGeoCache.dodec32, coreMat);
+      const core = createCachedPickupMesh(_sharedPickupGeoCache.dodec32, _sharedPickupMatCache.dropRateCore);
       pickupGroup.add(core);
 
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0x34d399 });
-      const ring = createCachedPickupMesh(_sharedPickupGeoCache.ring46, ringMat);
+      const ring = createCachedPickupMesh(_sharedPickupGeoCache.ring46, _sharedPickupMatCache.dropRateRing);
       ring.rotation.x = Math.PI * 0.35;
       pickupGroup.add(ring);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x10b981,
-        transparent: true,
-        opacity: 0.7,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam38, _sharedPickupMatCache.beamDropRate);
       beam.position.y = 1.9;
       pickupGroup.add(beam);
     } else if (type === 'double_drop_core') {
       // 倍ドロップ強化コア (ゴールド＆マゼンタのツインクリスタル)
-      const coreMat = new THREE.MeshStandardMaterial({
-        color: 0x332005,
-        roughness: 0.15,
-        metalness: 0.95,
-        emissive: 0xfbbf24,
-        emissiveIntensity: 0.9,
-      });
-      const core1 = createCachedPickupMesh(_sharedPickupGeoCache.octa28, coreMat);
+      const core1 = createCachedPickupMesh(_sharedPickupGeoCache.octa28, _sharedPickupMatCache.doubleDropCore);
       core1.position.set(-0.15, 0.1, 0);
-      const core2 = createCachedPickupMesh(_sharedPickupGeoCache.octa28, coreMat);
+      const core2 = createCachedPickupMesh(_sharedPickupGeoCache.octa28, _sharedPickupMatCache.doubleDropCore);
       core2.position.set(0.15, -0.1, 0);
       core2.scale.set(0.8, 0.8, 0.8);
       pickupGroup.add(core1, core2);
 
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-      const ring = createCachedPickupMesh(_sharedPickupGeoCache.ring48, ringMat);
+      const ring = createCachedPickupMesh(_sharedPickupGeoCache.ring48, _sharedPickupMatCache.doubleDropRing);
       ring.rotation.y = Math.PI * 0.4;
       pickupGroup.add(ring);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0xfbbf24,
-        transparent: true,
-        opacity: 0.75,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam40, _sharedPickupMatCache.beamDoubleDrop);
       beam.position.y = 2.0;
       pickupGroup.add(beam);
     } else if (type === 'invincible_core') {
       // 5秒無敵バリアコア (眩い黄金色の回転正二十面体ハイパーコア)
-      const starMat = new THREE.MeshStandardMaterial({
-        color: 0x332800,
-        roughness: 0.15,
-        metalness: 0.95,
-        emissive: 0xffd700,
-        emissiveIntensity: 1.0,
-      });
-      const star = createCachedPickupMesh(_sharedPickupGeoCache.ico36, starMat);
+      const star = createCachedPickupMesh(_sharedPickupGeoCache.ico36, _sharedPickupMatCache.invincibleStar);
       pickupGroup.add(star);
 
-      const halo1 = createCachedPickupMesh(
-        _sharedPickupGeoCache.halo52,
-        new THREE.MeshBasicMaterial({ color: 0xffea00 })
-      );
+      const halo1 = createCachedPickupMesh(_sharedPickupGeoCache.halo52, _sharedPickupMatCache.invincibleHalo1);
       halo1.rotation.x = Math.PI * 0.4;
-      const halo2 = createCachedPickupMesh(
-        _sharedPickupGeoCache.ring42,
-        new THREE.MeshBasicMaterial({ color: 0xffc400 })
-      );
+      const halo2 = createCachedPickupMesh(_sharedPickupGeoCache.ring42, _sharedPickupMatCache.invincibleHalo2);
       halo2.rotation.y = Math.PI * 0.45;
       pickupGroup.add(halo1, halo2);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0xffd700,
-        transparent: true,
-        opacity: 0.8,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam45, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam45, _sharedPickupMatCache.beamInvincible);
       beam.position.y = 2.25;
       pickupGroup.add(beam);
     } else {
       // 弾薬コンテナ (Cyan)
-      const boxMat = new THREE.MeshStandardMaterial({
-        color: 0x1d291b,
-        roughness: 0.4,
-        metalness: 0.7,
-        emissive: 0x00f3ff,
-        emissiveIntensity: 0.25,
-      });
-      const box = createCachedPickupMesh(_sharedPickupGeoCache.boxAmmo, boxMat);
+      const box = createCachedPickupMesh(_sharedPickupGeoCache.boxAmmo, _sharedPickupMatCache.ammoBox);
       pickupGroup.add(box);
 
-      const stripeMat = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
-      const stripe = createCachedPickupMesh(_sharedPickupGeoCache.stripeAmmo, stripeMat);
+      const stripe = createCachedPickupMesh(_sharedPickupGeoCache.stripeAmmo, _sharedPickupMatCache.ammoStripe);
       pickupGroup.add(stripe);
 
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x00f3ff,
-        transparent: true,
-        opacity: 0.5,
-      });
-      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam32, beamMat);
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam32, _sharedPickupMatCache.beamAmmo);
       beam.position.y = 1.6;
       pickupGroup.add(beam);
     }

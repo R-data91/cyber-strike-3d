@@ -1068,16 +1068,19 @@ export class NebulaBeamCannon extends Weapon {
     }
     this.beamHeat = Math.min(1.0, this.channelDuration / 1.5);
 
-    // 4段階の威力判定 (最低4段階)
-    if (this.channelDuration >= 1.45) {
+    // 5段階の威力判定 (Lv.1 〜 Lv.5)
+    if (this.channelDuration >= 2.0) {
+      this.currentTier = 5;
+      this.fireMode = '💥 GOD RAY Lv.5 [MAX] (3.8x)';
+    } else if (this.channelDuration >= 1.45) {
       this.currentTier = 4;
-      this.fireMode = '💥 MAX OVERLOAD (3.0x)';
+      this.fireMode = '⚡ OVERLOAD Lv.4 (2.9x)';
     } else if (this.channelDuration >= 0.85) {
       this.currentTier = 3;
-      this.fireMode = '🔥 HYPER Lv.3 (2.3x)';
+      this.fireMode = '🔥 HYPER Lv.3 (2.1x)';
     } else if (this.channelDuration >= 0.35) {
       this.currentTier = 2;
-      this.fireMode = '⚡ CHARGE Lv.2 (1.6x)';
+      this.fireMode = '⚡ CHARGE Lv.2 (1.5x)';
     } else {
       this.currentTier = 1;
       this.fireMode = 'BEAM Lv.1 (1.0x)';
@@ -1095,9 +1098,11 @@ export class NebulaBeamCannon extends Weapon {
       }
     }
 
-    // コアの蓄電発光色変化 (紫 -> シアン -> 黄金 -> 純白熱)
+    // コアの蓄電発光色変化 (紫 -> シアン -> 黄金 -> 純白熱 -> 極限シアン白光)
     if (this.glowMaterial) {
-      if (this.currentTier === 4) {
+      if (this.currentTier === 5) {
+        this.glowMaterial.color.setHex(0x00ffff);
+      } else if (this.currentTier === 4) {
         this.glowMaterial.color.setHex(0xffffff);
       } else if (this.currentTier === 3) {
         this.glowMaterial.color.setHex(0xffea00);
@@ -1205,16 +1210,17 @@ export class NebulaBeamCannon extends Weapon {
     }
 
     let rampMult = 1.0;
-    if (this.currentTier === 4) rampMult = 3.0;
-    else if (this.currentTier === 3) rampMult = 2.3;
-    else if (this.currentTier === 2) rampMult = 1.6;
+    if (this.currentTier === 5) rampMult = 3.8;
+    else if (this.currentTier === 4) rampMult = 2.9;
+    else if (this.currentTier === 3) rampMult = 2.1;
+    else if (this.currentTier === 2) rampMult = 1.5;
     else rampMult = 1.0;
 
     penetratingHits.forEach(h => {
       h.hit.rampMult = rampMult;
     });
 
-    // ユーザー要望: 4段階のビーム視覚演出を描画
+    // ユーザー要望: 5段階のビーム視覚演出を描画
     this.particles.createNebulaBeam(muzzleWorld, endPoint, this.currentTier, 0.09);
 
     if (wallHits.length > 0) {

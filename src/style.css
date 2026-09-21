@@ -680,6 +680,13 @@ body, html {
   animation: blink 0.5s infinite alternate;
 }
 
+.ammo-current.reloading {
+  color: var(--neon-amber);
+  text-shadow: 0 0 15px var(--neon-amber);
+  font-size: 32px;
+  animation: blink 0.35s infinite alternate;
+}
+
 @keyframes blink {
   0% { opacity: 0.4; }
   100% { opacity: 1; }

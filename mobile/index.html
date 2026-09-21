@@ -143,11 +143,6 @@
       <!-- 戦闘アナウンス & キルログ -->
       <div id="hud-center-notifications">
         <div id="announcement-banner" class="hidden"></div>
-        <div id="invincible-indicator" class="invincible-indicator hidden">
-          <span class="inv-icon">🛡️</span>
-          <span class="inv-title">無敵バリア展開中:</span>
-          <span id="invincible-timer-val" class="inv-timer">5.0s</span>
-        </div>
       </div>
       <div id="killfeed"></div>
 
@@ -279,6 +274,11 @@
 
         <!-- 弾薬メインパネル -->
         <div class="ammo-panel">
+          <div id="invincible-indicator" class="invincible-indicator hidden">
+            <span class="inv-icon">🛡️</span>
+            <span class="inv-title">無敵バリア:</span>
+            <span id="invincible-timer-val" class="inv-timer">5.0s</span>
+          </div>
           <div class="ammo-header">
             <span id="hud-current-weapon-name">AK-47</span>
             <span id="hud-fire-mode" class="tag">フルオート</span>
