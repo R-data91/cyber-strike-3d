@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBER STRIKE 3D - サイバーパンクFPS</title>
+  <meta name="description" content="ブラウザ上で動作する本格サイバーパンク3D FPS。多彩な未来兵器、人型アンドロイド兵士AI、プロシージャル音響、タクティカルHUDを搭載。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700;800;900&family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- 被弾・シールド破損エフェクト -->
+    <div id="damage-overlay" class="screen-fx"></div>
+    <div id="shield-overlay" class="screen-fx"></div>
+    <div id="low-hp-vignette" class="screen-fx"></div>
+    <div id="bullet-time-overlay" class="screen-fx hidden"></div>
+    <div id="invincible-overlay" class="screen-fx hidden"></div>
+    <div id="pickup-toast-container"></div>
+
+    <!-- スナイパー / レールガン ADS スコープ画面 -->
+    <div id="ads-scope-overlay" class="hidden">
+      <div class="scope-blur-mask"></div>
+      <div class="scope-circle">
+        <div class="scope-cross-h"></div>
+        <div class="scope-cross-v"></div>
+        <div class="scope-mil-dots"></div>
+        <div class="scope-readout-left">目標距離: 42.8m<br>照準倍率: 4.0X<br>手ブレ補正: 98%</div>
+        <div class="scope-readout-right">出力: 100%<br>電磁チャージ: 完了<br>ロックオン: 準備完了</div>
+      </div>
+    </div>
+
+    <!-- HUD Overlay -->
+    <div id="hud" class="hidden">
+      <!-- リアルタイム性能・メモリモニタ (F3キーで常時表示/非表示切替) -->
+      <div id="perf-monitor-hud" class="perf-monitor-hud hidden">
+        <div class="perf-item"><span class="perf-lbl">FPS:</span> <strong id="perf-fps" class="perf-val perf-good">60</strong></div>
+        <div class="perf-item"><span class="perf-lbl">FT:</span> <span id="perf-ft" class="perf-val">16.6ms</span></div>
+        <div class="perf-item"><span class="perf-lbl">DC:</span> <span id="perf-dc" class="perf-val">84</span></div>
+        <div class="perf-item"><span class="perf-lbl">TRI:</span> <span id="perf-tri" class="perf-val">24.5k</span></div>
+        <div class="perf-item"><span class="perf-lbl">GPU-GEO:</span> <span id="perf-geo" class="perf-val">68</span></div>
+        <div class="perf-item"><span class="perf-lbl">ENT:</span> <span id="perf-ent" class="perf-val">12</span></div>
+        <div class="perf-item"><span class="perf-lbl">PK:</span> <span id="perf-pk" class="perf-val">0</span></div>
+        <div class="perf-item"><span class="perf-lbl">HEAP:</span> <span id="perf-heap" class="perf-val">42MB</span></div>
+      </div>
+
+      <!-- トップバー: ウェーブからスコアまで左上に配置 (2段構成で中央ボスHUDとの重複解消) -->
+      <header id="hud-top">
+        <div class="hud-top-row">
+          <div class="hud-panel hud-wave">
+            <span class="hud-label">防衛ウェーブ</span>
+            <div class="hud-value-large" id="hud-wave-val">1</div>
+          </div>
+
+          <div class="hud-panel hud-score">
+            <span class="hud-label">戦闘スコア</span>
+            <div class="hud-value-medium" id="hud-score-val">0</div>
+            <div class="hud-sub" id="hud-streak-val">連続キル: 0x</div>
+          </div>
+        </div>
+
+        <div class="hud-panel hud-objective">
+          <span class="hud-label">敵性勢力ステータス</span>
+          <div class="hud-enemies-status">
+            敵兵残存: <span id="hud-enemies-left">0</span> / <span id="hud-enemies-total">0</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="wave-progress-fill" class="progress-bar-fill"></div>
+          </div>
+        </div>
+
+        <!-- EXステージ専用: 昇降高度インジケーター -->
+        <div id="hud-altitude-panel" class="hud-panel hud-altitude hidden">
+          <span class="hud-label" style="color: #ffd700;">軌道高度 (EX-ASCENSION)</span>
+          <div class="hud-enemies-status" style="color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);" id="hud-altitude-val">ALT: 12,000m ↑ 昇降中</div>
+        </div>
+      </header>
+
+      <!-- レイドボス専用ヘルスバー (上部中央の空き領域へ移動＆横幅拡張) -->
+      <div id="boss-hud-container" class="boss-hud-container hidden">
+        <div class="boss-hud-info">
+          <span class="boss-badge">⚠️ RAID BOSS</span>
+          <span id="boss-name" class="boss-name">機動要塞 TITAN-V1</span>
+          <span id="boss-hp-text" class="boss-hp-text">1600 / 1600</span>
+        </div>
+        <div class="boss-hp-track">
+          <div id="boss-hp-fill" class="boss-hp-fill"></div>
+        </div>
+      </div>
+
+      <!-- 戦闘アナウンス & キルログ -->
+      <div id="hud-center-notifications">
+        <div id="announcement-banner" class="hidden"></div>
+        <div id="invincible-indicator" class="invincible-indicator hidden">
+          <span class="inv-icon">🛡️</span>
+          <span class="inv-title">無敵バリア展開中:</span>
+          <span id="invincible-timer-val" class="inv-timer">5.0s</span>
+        </div>
+      </div>
+      <div id="killfeed"></div>
+
+      <!-- レティクル照準 & ヒットマーカー -->
+      <div id="crosshair-wrapper">
+        <div id="crosshair">
+          <div class="ch-part ch-top"></div>
+          <div class="ch-part ch-bottom"></div>
+          <div class="ch-part ch-left"></div>
+          <div class="ch-part ch-right"></div>
+          <div class="ch-dot"></div>
+        </div>
+        <div id="hitmarker" class="hidden">
+          <div class="hm-line hm-tl"></div>
+          <div class="hm-line hm-tr"></div>
+          <div class="hm-line hm-bl"></div>
+          <div class="hm-line hm-br"></div>
+          <div id="headshot-indicator" class="hidden">急所命中 (HEADSHOT)</div>
+        </div>
+        <div id="interaction-prompt" class="hidden"></div>
+      </div>
+
+      <!-- 右上エリア: 強化ステータスをマップすぐ左に配置 ＆ レーダーミニマップ -->
+      <div id="hud-top-right">
+        <div id="hud-upgrades-bar" class="hud-panel hud-upgrades">
+          <span class="hud-label">兵装強化ステータス</span>
+          <div class="upgrade-badges-row">
+            <span id="badge-dmg-up" class="upgrade-badge dmg">威力: x1.0</span>
+            <span id="badge-mag-up" class="upgrade-badge mag">弾倉: 標準</span>
+            <span id="badge-rate-up" class="upgrade-badge rate">連射: x1.0</span>
+            <span id="badge-range-up" class="upgrade-badge range">範囲: 標準</span>
+            <span id="badge-speed-up" class="upgrade-badge speed">機動: x1.0</span>
+            <span id="badge-drop-up" class="upgrade-badge drop">泥率: 80%</span>
+            <span id="badge-double-drop" class="upgrade-badge double-drop">倍泥: なし</span>
+          </div>
+        </div>
+
+        <div id="minimap-container">
+          <div class="minimap-header">索敵レーダー // 50M</div>
+          <canvas id="minimap-canvas" width="160" height="160"></canvas>
+        </div>
+      </div>
+
+      <!-- 左下: プレイヤーバイタル (シールド, HP, スタミナ) -->
+      <footer id="hud-bottom-left">
+        <div class="vitals-panel">
+          <!-- シールドバー -->
+          <div class="vital-row">
+            <div class="vital-meta">
+              <span class="vital-icon shield-icon">🛡️</span>
+              <span class="vital-name">サイバーシールド</span>
+              <span class="vital-num" id="hud-shield-text">0 / 200</span>
+            </div>
+            <div class="bar-track">
+              <div id="hud-shield-bar" class="bar-fill shield-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- HP / 耐久値バー -->
+          <div class="vital-row">
+            <div class="vital-meta">
+              <span class="vital-icon hp-icon">❤️</span>
+              <span class="vital-name">アーマー / HP</span>
+              <span class="vital-num" id="hud-hp-text">100 / 100</span>
+            </div>
+            <div class="bar-track">
+              <div id="hud-hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- ダッシュスタミナバー -->
+          <div class="vital-row compact">
+            <div class="vital-meta">
+              <span class="vital-name small">ブースタースタミナ</span>
+              <span class="vital-num small" id="hud-stamina-text">100%</span>
+            </div>
+            <div class="bar-track tiny">
+              <div id="hud-stamina-bar" class="bar-fill stamina-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- アドレナリン・バレットタイム -->
+          <div class="vital-row compact adrenaline-row">
+            <div class="vital-meta">
+              <span class="vital-icon adrenaline-icon">⚡</span>
+              <span class="vital-name small">バレットタイム [Q]</span>
+              <span class="vital-num small" id="hud-adrenaline-text">0%</span>
+            </div>
+            <div class="bar-track tiny">
+              <div id="hud-adrenaline-bar" class="bar-fill adrenaline-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <!-- 右下: 武器 & 弾薬ステータス (全6種兵装スロット) -->
+      <footer id="hud-bottom-right">
+        <!-- 武器スロット選択 (ユーザー要望: 1~3と4~6+手榴弾の2行構成) -->
+        <div class="weapon-slots-container">
+          <div class="weapon-slots-row">
+            <div class="weapon-slot active" id="slot-1" data-slot="1">
+              <span class="slot-num">1</span>
+              <span class="slot-name">AK-47</span>
+            </div>
+            <div class="weapon-slot" id="slot-2" data-slot="2">
+              <span class="slot-num">2</span>
+              <span class="slot-name">散弾銃</span>
+            </div>
+            <div class="weapon-slot" id="slot-3" data-slot="3">
+              <span class="slot-num">3</span>
+              <span class="slot-name">狙撃銃</span>
+            </div>
+          </div>
+          <div class="weapon-slots-row">
+            <div class="weapon-slot" id="slot-4" data-slot="4">
+              <span class="slot-num">4</span>
+              <span class="slot-name">高速SMG</span>
+            </div>
+            <div class="weapon-slot" id="slot-5" data-slot="5">
+              <span class="slot-num">5</span>
+              <span class="slot-name">榴弾砲</span>
+            </div>
+            <div class="weapon-slot" id="slot-6" data-slot="6">
+              <span class="slot-num">6</span>
+              <span class="slot-name">光線砲</span>
+            </div>
+            <div class="weapon-slot grenade-slot" id="slot-grenade">
+              <span class="slot-num">G</span>
+              <span class="slot-name">手榴弾 <b id="hud-grenade-count">x3</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 弾薬メインパネル -->
+        <div class="ammo-panel">
+          <div class="ammo-header">
+            <span id="hud-current-weapon-name">AK-47</span>
+            <span id="hud-fire-mode" class="tag">フルオート</span>
+            <span id="hud-wield-mode" class="tag wield-badge hidden">2丁流 ⚔️</span>
+          </div>
+
+          <div class="ammo-readout">
+            <span id="hud-ammo-current" class="ammo-current">30</span>
+            <span class="ammo-divider">/</span>
+            <span id="hud-ammo-reserve" class="ammo-reserve">180</span>
+          </div>
+
+          <div id="reload-indicator" class="hidden">
+            <div class="reload-spinner"></div>
+            <span>リロード中... [R]</span>
+          </div>
+
+          <div id="ammo-bars-container" class="ammo-bullets-grid"></div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- レールガン専用 サイバースナイパースコープHUDオーバーレイ -->
+    <div id="sniper-scope-overlay" class="hidden">
+      <div class="scope-vignette"></div>
+      <div class="scope-lens">
+        <div class="scope-crosshair-h"></div>
+        <div class="scope-crosshair-v"></div>
+        <div class="scope-reticle-ring"></div>
+        <div class="scope-center-point"></div>
+        <div class="scope-telemetry top-left">OPTICAL 4.5X // HIGH-VELOCITY RAIL</div>
+        <div class="scope-telemetry top-right">TARGET ACQUISITION: ACTIVE</div>
+        <div class="scope-telemetry bottom-left">DAMAGE MULTIPLIER: OPTIMAL</div>
+        <div class="scope-telemetry bottom-right">BALLISTIC ARC: LINEAR</div>
+      </div>
+    </div>
+
+    <!-- スタート / タイトル画面 -->
+    <div id="start-screen" class="modal-overlay">
+      <div class="terminal-modal">
+        <div class="modal-decor-corner tl"></div>
+        <div class="modal-decor-corner tr"></div>
+        <div class="modal-decor-corner bl"></div>
+        <div class="modal-decor-corner br"></div>
+
+        <div class="game-badge">戦術サイバー・アリーナ // 戦闘シミュレータ</div>
+        <h1 class="game-title">CYBER<span>STRIKE</span> 3D</h1>
+        <p class="game-subtitle">全10戦域 ＆ 2丁・3丁流兵装 ＆ 超軌道EXステージ // Ver 5.0 極限進化アップデート</p>
+
+        <div class="menu-briefing wide-dashboard">
+          <!-- カラム1: 作戦概要 ＆ 最新アップデート -->
+          <div class="briefing-box">
+            <h3>作戦任務 ＆ 最新アップデート</h3>
+            <p class="briefing-desc">
+              全10種の戦域バイオームを展開！迫り来る敵兵の急所を撃ち抜き、戦術アイテムを回収して全6種の最新兵装を強化せよ。
+            </p>
+            <div class="update-highlights">
+              <div class="update-item">👑 <b>レイドボス進化</b>: 第5波ごとに出現！10波毎に2倍、それ以外は1.5倍！5種の巨大ボスが多彩に襲来</div>
+              <div class="update-item">⚔️ <b>2丁流・3丁流モード</b>: 装弾数増加で弾色変化（青→黄→橙→赤→紫→虹）！3,000発で二丁、6,000発で三丁流！画面に実武器を同時展開</div>
+              <div class="update-item">🌌 <b>EXステージ【超軌道昇降機】</b>: 高度100,000m宇宙空間！反重力＆空中3段ジェットブースト、終焉天核OMEGA-SERAPH直接対決</div>
+              <div class="update-item">🛡️ <b>防壁拡張システム</b>: 5ステージ毎にシールド上限+50、10ステージ毎にHP上限+50が永続増加</div>
+              <div class="update-item">📦 <b>ウェーブクリア自動回収</b>: クリア時に全戦利品を一括回収＆個別ログ通知</div>
+              <div class="update-item">🔫 <b>全6種兵装＆手榴弾</b>: AK-47、散弾、狙撃、高速SMG、榴弾砲、光線砲＋手榴弾</div>
+            </div>
+          </div>
+
+          <!-- カラム2: 戦利品 ＆ 兵装強化コア一覧 -->
+          <div class="cores-guide-box">
+            <h3>戦術戦利品 ＆ 兵装強化コア</h3>
+            <div class="cores-list">
+              <div class="core-card dmg">
+                <span class="core-icon">🟣</span>
+                <div class="core-info"><b>威力増幅コア</b>: 全武器威力 +10% 永続強化</div>
+              </div>
+              <div class="core-card mag">
+                <span class="core-icon">🟡</span>
+                <div class="core-info"><b>拡張弾倉コア</b>: 全6武器の装弾数拡張 (2丁・3丁流への道)</div>
+              </div>
+              <div class="core-card rate">
+                <span class="core-icon">🔥</span>
+                <div class="core-info"><b>連射加速コア</b>: 全武器の連射速度 +12% 向上</div>
+              </div>
+              <div class="core-card range">
+                <span class="core-icon">🔷</span>
+                <div class="core-info"><b>攻撃範囲コア</b>: 弾道電磁誘導 +25cm, 爆風拡大</div>
+              </div>
+              <div class="core-card speed">
+                <span class="core-icon">🟢</span>
+                <div class="core-info"><b>機動ブースター</b>: 移動速度 +1.0% 向上</div>
+              </div>
+              <div class="core-card drop">
+                <span class="core-icon">💎</span>
+                <div class="core-info"><b>ドロップ率強化コア</b>: アイテム出現率 +5% 向上 (最大100%)</div>
+              </div>
+              <div class="core-card double">
+                <span class="core-icon">✨</span>
+                <div class="core-info"><b>倍・トリプルドロップコア</b>: 戦利品2倍化！100%後は3倍(トリプル)へ神進化！</div>
+              </div>
+              <div class="core-card inv">
+                <span class="core-icon">🛡️</span>
+                <div class="core-info"><b>無敵バリアコア</b>: 5秒間 全ダメージ完全無効化</div>
+              </div>
+              <div class="core-card supply">
+                <span class="core-icon">💙</span>
+                <div class="core-info"><b>シールド・医療物資</b>: シールド最大+75回復, HP回復</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- カラム3: 操作方法 (CONTROLS) -->
+          <div class="controls-guide">
+            <h3>操作方法 (CONTROLS)</h3>
+            <div class="controls-grid">
+              <div class="ctrl-item"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>移動 (歩行・前進・後退)</span></div>
+              <div class="ctrl-item"><kbd>マウス</kbd><span>照準・視点移動 (Aim)</span></div>
+              <div class="ctrl-item"><kbd>左クリック</kbd><span>射撃 (Fire Weapon)</span></div>
+              <div class="ctrl-item"><kbd>右クリック / Z</kbd><span>精密照準・ADS / スコープ</span></div>
+              <div class="ctrl-item"><kbd>SHIFT</kbd><span>高速ダッシュ (Sprint)</span></div>
+              <div class="ctrl-item"><kbd>SPACE</kbd><span>跳躍 / EX空中3段ジェットブースト</span></div>
+              <div class="ctrl-item"><kbd>C</kbd> / <kbd>CTRL</kbd><span>スライディング / しゃがみ</span></div>
+              <div class="ctrl-item"><kbd>R</kbd><span>弾薬リロード (Reload)</span></div>
+              <div class="ctrl-item"><kbd>G</kbd><span>戦術手榴弾投擲 (Frag Grenade)</span></div>
+              <div class="ctrl-item"><kbd>Q</kbd><span>アドレナリン・減速 (Bullet Time)</span></div>
+              <div class="ctrl-item"><kbd>1</kbd>〜<kbd>6</kbd> / <kbd>ホイール</kbd><span>武器スロット 1〜6 切替</span></div>
+              <div class="ctrl-item"><kbd>ESC</kbd> / <kbd>P</kbd><span>一時停止 (Pause Menu)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 設定スライダー -->
+        <div class="start-settings-bar">
+          <div class="setting-item">
+            <label for="select-quality">グラフィック画質:</label>
+            <select id="select-quality" class="cyber-select">
+              <option value="low">低 (超軽量 60-120FPS)</option>
+              <option value="medium" selected>中 (標準バランス・推奨)</option>
+              <option value="high">高 (高画質)</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="input-sens">マウス感度: <span id="sens-val-display">0.80</span></label>
+            <input type="range" id="input-sens" min="0.05" max="3.0" step="0.05" value="0.80">
+          </div>
+          <div class="setting-item">
+            <label for="input-sfx-vol">効果音(銃声): <span id="sfx-vol-val-display">90%</span></label>
+            <input type="range" id="input-sfx-vol" min="0" max="100" step="5" value="90">
+          </div>
+          <div class="setting-item">
+            <label for="input-bgm-vol">BGM音量: <span id="bgm-vol-val-display">10%</span></label>
+            <input type="range" id="input-bgm-vol" min="0" max="100" step="5" value="10">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap;">
+          <button id="btn-start-game" class="btn-cyber-primary">
+            <span class="btn-glitch"></span>
+            <span class="btn-text">作戦開始 [クリックして出撃]</span>
+          </button>
+          <button id="btn-start-ex" class="btn-cyber-secondary" onclick="window.startEX ? window.startEX() : (window.game && window.game.startEXStage());" style="border-color: #ffd700; color: #ffd700; box-shadow: 0 0 18px rgba(255, 215, 0, 0.45); font-weight: 900; cursor: pointer;">
+            🚀 EXステージ直行 [STAGE 100突破体験]
+          </button>
+        </div>
+
+        <div class="modal-footer-note">
+          ※ 起動時にマウスカーソルが画面中央にロックされます（解除はESCキー） | F3キーでリアルタイム性能モニタ表示
+        </div>
+      </div>
+    </div>
+
+    <!-- ポーズメニュー画面 -->
+    <div id="pause-screen" class="modal-overlay hidden">
+      <div class="terminal-modal small">
+        <h2 class="modal-title">作戦一時停止中</h2>
+        <p class="modal-sub">シミュレーションを中断しています</p>
+
+        <div class="pause-settings-panel">
+          <div class="setting-item">
+            <label for="pause-select-quality">グラフィック画質:</label>
+            <select id="pause-select-quality" class="cyber-select">
+              <option value="low">低 (超軽量 60-120FPS)</option>
+              <option value="medium" selected>中 (標準バランス・推奨)</option>
+              <option value="high">高 (高画質)</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="pause-input-sens">マウス感度: <span id="pause-sens-val">0.80</span></label>
+            <input type="range" id="pause-input-sens" min="0.05" max="3.0" step="0.05" value="0.80">
+          </div>
+          <div class="setting-item">
+            <label for="pause-input-sfx-vol">効果音(銃声): <span id="pause-sfx-vol-val">90%</span></label>
+            <input type="range" id="pause-input-sfx-vol" min="0" max="100" step="5" value="90">
+          </div>
+          <div class="setting-item">
+            <label for="pause-input-bgm-vol">BGM音量: <span id="pause-bgm-vol-val">10%</span></label>
+            <input type="range" id="pause-input-bgm-vol" min="0" max="100" step="5" value="10">
+          </div>
+        </div>
+
+        <div class="modal-btn-group">
+          <button id="btn-resume-game" class="btn-cyber-primary">作戦を再開する</button>
+          <button id="btn-restart-game" class="btn-cyber-secondary">最初からやり直す</button>
+        </div>
+        <button id="btn-pause-ex" class="btn-cyber-secondary" style="border-color: #ffd700; color: #ffd700; width: 100%; margin-top: 10px; font-weight: 800; box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);">
+          🚀 EXステージへワープ (第100層突破体験)
+        </button>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px; width: 100%;">
+          <button id="btn-toggle-perf-monitor" class="btn-cyber-secondary" style="flex: 1; font-size: 11px; padding: 7px 10px; border-color: rgba(0, 243, 255, 0.4); color: #00f3ff;">
+            📊 性能モニタ [F3]
+          </button>
+          <button id="btn-export-perf-report" class="btn-cyber-secondary" style="flex: 1; font-size: 11px; padding: 7px 10px; border-color: rgba(0, 255, 136, 0.4); color: #00ff88;">
+            📋 診断ログ出力
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ゲームオーバー / 作戦完了画面 -->
+    <div id="gameover-screen" class="modal-overlay hidden">
+      <div class="terminal-modal">
+        <div id="gameover-banner" class="debrief-banner failure">作戦終了 // 戦闘不能</div>
+        <h2 id="gameover-title" class="gameover-header">PLAYER DOWN</h2>
+        <p id="gameover-desc" class="gameover-desc">バイタル反応消失。ニューラルリンク切断。</p>
+
+        <div class="stats-summary-grid">
+          <div class="stat-box">
+            <span class="stat-label">最終スコア</span>
+            <span class="stat-value" id="stat-final-score">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">防衛達成ウェーブ</span>
+            <span class="stat-value" id="stat-waves-cleared">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">撃破した敵兵数</span>
+            <span class="stat-value" id="stat-kills">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">射撃命中率</span>
+            <span class="stat-value" id="stat-accuracy">0%</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">ヘッドショット撃破</span>
+            <span class="stat-value" id="stat-headshots">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">最大連続キル</span>
+            <span class="stat-value" id="stat-max-streak">0</span>
+          </div>
+        </div>
+
+        <div class="modal-btn-group">
+          <button id="btn-play-again" class="btn-cyber-primary">再出撃する (REDEPLOY)</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
