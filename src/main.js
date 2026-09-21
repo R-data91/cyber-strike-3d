@@ -55,14 +55,16 @@ function createCachedPickupMesh(geo, mat) {
   return m;
 }
 
-class CyberStrikeGame {
-  constructor() {
+export class CyberStrikeGame {
+  constructor(options = {}) {
+    this.options = options;
+    this.isMobile = !!options.isMobile;
     this.state = 'MENU'; // 'MENU' | 'PLAYING' | 'PAUSED' | 'GAMEOVER'
 
     // Core Systems
     this.engine = new Engine('canvas-container');
     this.audio = new AudioManager();
-    this.input = new InputManager(this.engine.renderer.domElement);
+    this.input = options.input || new InputManager(this.engine.renderer.domElement);
     this.particles = new ParticleSystem(this.engine.scene);
     this.level = new Level(this.engine.scene);
     this.player = new Player(this.engine, this.input, this.audio, this.particles, this.level);
@@ -426,7 +428,9 @@ class CyberStrikeGame {
     this.gameoverScreen.classList.add('hidden');
     this.hud.show();
 
-    this.input.requestLock();
+    if (!this.isMobile && typeof this.input.requestLock === 'function') {
+      this.input.requestLock();
+    }
     this.startWave(1);
   }
 
@@ -435,7 +439,9 @@ class CyberStrikeGame {
     this.state = 'PAUSED';
     this.audio.stopAscensionAmbience();
     this.pauseScreen.classList.remove('hidden');
-    this.input.exitLock();
+    if (!this.isMobile && typeof this.input.exitLock === 'function') {
+      this.input.exitLock();
+    }
   }
 
   resumeGame() {
@@ -445,7 +451,9 @@ class CyberStrikeGame {
       this.audio.playAscensionAmbience();
     }
     this.pauseScreen.classList.add('hidden');
-    this.input.requestLock();
+    if (!this.isMobile && typeof this.input.requestLock === 'function') {
+      this.input.requestLock();
+    }
   }
 
   restartGame() {
@@ -1935,7 +1943,13 @@ window.getPerfReport = () => window.game ? window.game.getPerfReport() : 'Game n
 window.downloadPerfLog = () => window.game?.downloadPerfLog();
 window.togglePerfMonitor = (force) => window.game?.togglePerfMonitor(force);
 
-// Instantiate Game on DOM Load
-window.addEventListener('DOMContentLoaded', () => {
-  window.game = new CyberStrikeGame();
-});
+// Instantiate Game on DOM Load if not running in mobile entry mode
+if (!window.__CYBER_STRIKE_MOBILE_ENTRY__) {
+  window.addEventListener('DOMContentLoaded', () => {
+    // Also guard in case mobile entry script sets the flag before DOMContentLoaded fires
+    if (!window.__CYBER_STRIKE_MOBILE_ENTRY__) {
+      window.game = new CyberStrikeGame();
+    }
+  });
+}
+

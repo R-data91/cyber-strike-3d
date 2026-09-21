@@ -1,0 +1,625 @@
+/* CYBER STRIKE 3D - MOBILE & TABLET OPTIMIZED STYLESHEET */
+@import './style.css';
+
+/* Touch & Gesture Prevention */
+html, body, #app {
+  touch-action: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  overscroll-behavior: none !important;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Safe Area Insets for Notch / Dynamic Island */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ================= PORTRAIT ROTATE OVERLAY ================= */
+#rotate-device-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #0a1128 0%, #030611 100%);
+  z-index: 100000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.rotate-card {
+  background: rgba(10, 20, 42, 0.88);
+  border: 2px solid var(--neon-cyan);
+  box-shadow: 0 0 35px var(--neon-cyan-glow);
+  border-radius: 16px;
+  padding: 32px 24px;
+  max-width: 360px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rotate-icon-wrapper {
+  font-size: 54px;
+  margin-bottom: 16px;
+  animation: rotate-phone 2s infinite ease-in-out;
+}
+
+@keyframes rotate-phone {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(-90deg); }
+  65% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.rotate-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--neon-cyan);
+  margin-bottom: 8px;
+  letter-spacing: 1.5px;
+}
+
+.rotate-subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Display overlay on portrait screens */
+@media (orientation: portrait) {
+  #rotate-device-overlay {
+    display: flex !important;
+  }
+}
+
+/* ================= TOUCH CONTROLS OVERLAY ================= */
+#touch-controls-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Left Joystick Zone */
+#joystick-zone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48vw;
+  height: 100vh;
+  pointer-events: auto;
+  touch-action: none;
+  z-index: 22;
+}
+
+#joystick-base {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  margin-left: -60px;
+  margin-top: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 243, 255, 0.08) 0%, rgba(0, 30, 60, 0.45) 80%);
+  border: 2px solid rgba(0, 243, 255, 0.45);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.25), inset 0 0 15px rgba(0, 243, 255, 0.15);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#joystick-base.active {
+  opacity: 1;
+  transform: scale(1.0);
+}
+
+#joystick-stick {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #00f3ff 0%, #0077aa 80%, #004466 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 16px rgba(0, 243, 255, 0.85);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Sprint indicator arrow on joystick */
+.joystick-sprint-hint {
+  position: absolute;
+  top: -26px;
+  font-size: 11px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--neon-cyan);
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+/* Right Aim Surface Zone */
+#aim-zone {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 52vw;
+  height: 100vh;
+  pointer-events: auto;
+  touch-action: none;
+  z-index: 21;
+}
+
+/* Action Button Container */
+.touch-action-group {
+  position: absolute;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* General Touch Button */
+.touch-btn {
+  pointer-events: auto;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 16, 32, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 243, 255, 0.4);
+  color: var(--text-main);
+  font-family: var(--font-display);
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 0 8px rgba(0, 243, 255, 0.15);
+  transition: transform 0.08s ease, border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.touch-btn:active, .touch-btn.pressed {
+  transform: scale(0.92);
+  background: rgba(0, 243, 255, 0.28);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px var(--neon-cyan-glow), inset 0 0 14px rgba(0, 243, 255, 0.4);
+}
+
+.touch-btn-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.touch-btn-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  opacity: 0.88;
+}
+
+/* Primary Fire Button (Right-bottom big) */
+#btn-fire {
+  position: absolute;
+  bottom: calc(28px + var(--safe-bottom));
+  right: calc(36px + var(--safe-right));
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.28) 0%, rgba(18, 10, 24, 0.82) 80%);
+  border: 2.5px solid var(--neon-magenta);
+  box-shadow: 0 0 24px var(--neon-magenta-glow), inset 0 0 12px rgba(255, 0, 85, 0.3);
+  z-index: 26;
+}
+
+#btn-fire:active, #btn-fire.pressed {
+  transform: scale(0.92);
+  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.6) 0%, rgba(255, 0, 85, 0.2) 80%);
+  box-shadow: 0 0 35px var(--neon-magenta-glow), inset 0 0 20px rgba(255, 0, 85, 0.7);
+}
+
+#btn-fire .touch-btn-icon {
+  font-size: 28px;
+}
+
+#btn-fire .touch-btn-label {
+  color: var(--neon-magenta);
+  font-weight: 800;
+}
+
+/* Secondary Left Fire Button */
+#btn-left-fire {
+  position: absolute;
+  top: calc(72px + var(--safe-top));
+  left: calc(20px + var(--safe-left));
+  width: 52px;
+  height: 52px;
+  border-color: rgba(255, 0, 85, 0.45);
+  z-index: 26;
+}
+
+#btn-left-fire:active, #btn-left-fire.pressed {
+  border-color: var(--neon-magenta);
+  background: rgba(255, 0, 85, 0.3);
+}
+
+/* ADS / Precision Scope Button */
+#btn-ads {
+  position: absolute;
+  bottom: calc(118px + var(--safe-bottom));
+  right: calc(48px + var(--safe-right));
+  width: 58px;
+  height: 58px;
+  border-color: rgba(0, 243, 255, 0.6);
+  z-index: 26;
+}
+
+#btn-ads.toggled {
+  border-color: #ffd700;
+  background: rgba(255, 215, 0, 0.25);
+  box-shadow: 0 0 22px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+#btn-ads.toggled .touch-btn-label {
+  color: #ffd700;
+}
+
+/* Jump Button */
+#btn-jump {
+  position: absolute;
+  bottom: calc(88px + var(--safe-bottom));
+  right: calc(130px + var(--safe-right));
+  width: 56px;
+  height: 56px;
+  border-color: rgba(0, 255, 136, 0.6);
+  z-index: 26;
+}
+
+#btn-jump:active, #btn-jump.pressed {
+  border-color: var(--neon-green);
+  background: rgba(0, 255, 136, 0.3);
+}
+
+#btn-jump .touch-btn-label {
+  color: var(--neon-green);
+}
+
+/* Slide / Crouch Button */
+#btn-crouch {
+  position: absolute;
+  bottom: calc(24px + var(--safe-bottom));
+  right: calc(130px + var(--safe-right));
+  width: 54px;
+  height: 54px;
+  border-color: rgba(255, 183, 3, 0.6);
+  z-index: 26;
+}
+
+#btn-crouch:active, #btn-crouch.pressed {
+  border-color: var(--neon-amber);
+  background: rgba(255, 183, 3, 0.3);
+}
+
+#btn-crouch .touch-btn-label {
+  color: var(--neon-amber);
+}
+
+/* Reload Button */
+#btn-reload {
+  position: absolute;
+  bottom: calc(118px + var(--safe-bottom));
+  right: calc(118px + var(--safe-right));
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 243, 255, 0.5);
+  z-index: 26;
+}
+
+/* Tactical Grenade Button */
+#btn-grenade {
+  position: absolute;
+  bottom: calc(182px + var(--safe-bottom));
+  right: calc(38px + var(--safe-right));
+  width: 46px;
+  height: 46px;
+  border-color: rgba(255, 80, 0, 0.6);
+  z-index: 26;
+}
+
+#btn-grenade .badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff5500;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 8px;
+  border: 1px solid #fff;
+}
+
+/* Bullet Time / Adrenaline Button */
+#btn-bullet-time {
+  position: absolute;
+  bottom: calc(178px + var(--safe-bottom));
+  right: calc(100px + var(--safe-right));
+  width: 46px;
+  height: 46px;
+  border-color: rgba(255, 215, 0, 0.6);
+  z-index: 26;
+}
+
+/* Top System Buttons (Pause & Fullscreen) */
+.mobile-top-actions {
+  position: absolute;
+  top: calc(12px + var(--safe-top));
+  left: calc(16px + var(--safe-left));
+  display: flex;
+  gap: 10px;
+  z-index: 35;
+  pointer-events: auto;
+}
+
+.mobile-sys-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: rgba(8, 14, 28, 0.82);
+  border: 1.5px solid rgba(0, 243, 255, 0.4);
+  color: var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.mobile-sys-btn:active {
+  background: rgba(0, 243, 255, 0.3);
+  transform: scale(0.92);
+}
+
+/* Mobile Quick Weapon Switcher (Bottom Center) */
+#mobile-weapon-bar {
+  position: absolute;
+  bottom: calc(10px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(6, 12, 24, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 243, 255, 0.35);
+  border-radius: 20px;
+  padding: 4px 10px;
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.mobile-wpn-switch-btn {
+  background: rgba(0, 243, 255, 0.12);
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  color: var(--neon-cyan);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.mobile-wpn-switch-btn:active {
+  background: rgba(0, 243, 255, 0.4);
+}
+
+.mobile-wpn-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+}
+
+.mobile-wpn-name {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--neon-cyan);
+}
+
+.mobile-wpn-ammo {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* ================= MOBILE HUD RESPONSIVENESS ================= */
+#hud-top {
+  top: calc(10px + var(--safe-top)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  width: auto !important;
+  max-width: 65vw;
+}
+
+#hud-top .hud-panel {
+  padding: 4px 10px !important;
+}
+
+#hud-top .hud-value-large {
+  font-size: 18px !important;
+}
+
+#hud-top .hud-value-medium {
+  font-size: 14px !important;
+}
+
+#hud-top-right {
+  top: calc(10px + var(--safe-top)) !important;
+  right: calc(12px + var(--safe-right)) !important;
+}
+
+#hud-upgrades-bar {
+  display: none !important; /* Hide long badge text on small screens */
+}
+
+#minimap-container {
+  width: 96px !important;
+  height: 96px !important;
+}
+
+#minimap-canvas {
+  width: 96px !important;
+  height: 96px !important;
+}
+
+#minimap-container .minimap-header {
+  font-size: 9px !important;
+  padding: 1px 4px !important;
+}
+
+#hud-bottom-left {
+  bottom: calc(10px + var(--safe-bottom)) !important;
+  left: calc(12px + var(--safe-left)) !important;
+  max-width: 170px !important;
+  pointer-events: none;
+}
+
+.vitals-panel {
+  padding: 6px 10px !important;
+  background: rgba(8, 14, 28, 0.65) !important;
+  border-radius: 8px !important;
+}
+
+.vital-name {
+  font-size: 10px !important;
+}
+
+.vital-num {
+  font-size: 10px !important;
+}
+
+.bar-track {
+  height: 6px !important;
+}
+
+/* Hide bulky PC weapon slots in mobile in favor of #mobile-weapon-bar */
+#hud-bottom-right {
+  display: none !important;
+}
+
+/* Boss HUD on Mobile */
+.boss-hud-container {
+  top: calc(52px + var(--safe-top)) !important;
+  width: 70vw !important;
+  max-width: 440px !important;
+}
+
+/* Crosshair sizing */
+#crosshair {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* Mobile Start Modal Adjustments */
+.terminal-modal {
+  max-width: 92vw !important;
+  max-height: 88vh !important;
+  padding: 18px 20px !important;
+  overflow-y: auto !important;
+}
+
+.wide-dashboard {
+  flex-direction: column !important;
+  max-height: 38vh !important;
+  overflow-y: auto !important;
+}
+
+.game-title {
+  font-size: 26px !important;
+}
+
+.game-subtitle {
+  font-size: 11px !important;
+  margin-bottom: 12px !important;
+}
+
+.start-settings-bar {
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  margin: 12px 0 !important;
+}
+
+.setting-item {
+  flex: 1 1 45% !important;
+  min-width: 140px !important;
+}
+
+/* Gyro Switch toggle design */
+.toggle-switch-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.toggle-checkbox {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 11px;
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toggle-checkbox:checked {
+  background: var(--neon-cyan);
+}
+
+.toggle-checkbox::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s ease;
+}
+
+.toggle-checkbox:checked::before {
+  transform: translateX(22px);
+}
