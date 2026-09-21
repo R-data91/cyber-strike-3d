@@ -241,8 +241,8 @@ html, body, #app {
   position: absolute;
   bottom: calc(14px + var(--safe-bottom));
   right: calc(14px + var(--safe-right));
-  width: 82px;
-  height: 82px;
+  width: 94px;
+  height: 94px;
   border-radius: 50%;
   background: radial-gradient(circle at center, rgba(255, 0, 85, 0.35) 0%, rgba(255, 70, 0, 0.2) 50%, rgba(18, 10, 24, 0.85) 90%);
   border: 2.5px solid #ff0055;
@@ -258,25 +258,23 @@ html, body, #app {
 }
 
 #btn-fire .touch-btn-icon {
-  font-size: 28px;
+  font-size: 32px;
 }
 
 #btn-fire .touch-btn-label {
   color: #ff3377;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   text-shadow: 0 0 6px rgba(255, 0, 85, 0.8);
 }
 
-
-
 /* ジャンプボタン (射撃ボタンのすぐ上) */
 #btn-jump {
   position: absolute;
-  bottom: calc(108px + var(--safe-bottom));
-  right: calc(16px + var(--safe-right));
-  width: 52px;
-  height: 52px;
+  bottom: calc(118px + var(--safe-bottom));
+  right: calc(18px + var(--safe-right));
+  width: 54px;
+  height: 54px;
   border-color: rgba(0, 255, 136, 0.65);
   z-index: 72;
 }
@@ -293,10 +291,10 @@ html, body, #app {
 /* スライディング / しゃがみボタン (射撃ボタンのすぐ左) */
 #btn-crouch {
   position: absolute;
-  bottom: calc(16px + var(--safe-bottom));
-  right: calc(106px + var(--safe-right));
-  width: 48px;
-  height: 48px;
+  bottom: calc(18px + var(--safe-bottom));
+  right: calc(118px + var(--safe-right));
+  width: 50px;
+  height: 50px;
   border-color: rgba(255, 183, 3, 0.65);
   z-index: 72;
 }
@@ -313,10 +311,10 @@ html, body, #app {
 /* ADS / 精密照準ボタン (射撃ボタンの斜め左上) */
 #btn-ads {
   position: absolute;
-  bottom: calc(92px + var(--safe-bottom));
-  right: calc(92px + var(--safe-right));
-  width: 50px;
-  height: 50px;
+  bottom: calc(102px + var(--safe-bottom));
+  right: calc(102px + var(--safe-right));
+  width: 52px;
+  height: 52px;
   border-color: rgba(0, 243, 255, 0.65);
   z-index: 72;
 }
@@ -334,10 +332,10 @@ html, body, #app {
 /* リロードボタン (ジャンプのすぐ上) */
 #btn-reload {
   position: absolute;
-  bottom: calc(170px + var(--safe-bottom));
-  right: calc(18px + var(--safe-right));
-  width: 44px;
-  height: 44px;
+  bottom: calc(180px + var(--safe-bottom));
+  right: calc(20px + var(--safe-right));
+  width: 46px;
+  height: 46px;
   border-color: rgba(0, 243, 255, 0.55);
   z-index: 72;
 }
@@ -345,10 +343,10 @@ html, body, #app {
 /* 戦術手榴弾ボタン (リロードの左) */
 #btn-grenade {
   position: absolute;
-  bottom: calc(168px + var(--safe-bottom));
-  right: calc(74px + var(--safe-right));
-  width: 42px;
-  height: 42px;
+  bottom: calc(178px + var(--safe-bottom));
+  right: calc(78px + var(--safe-right));
+  width: 44px;
+  height: 44px;
   border-color: rgba(255, 80, 0, 0.65);
   z-index: 72;
 }
@@ -369,10 +367,10 @@ html, body, #app {
 /* バレットタイム / アドレナリンボタン */
 #btn-bullet-time {
   position: absolute;
-  bottom: calc(158px + var(--safe-bottom));
-  right: calc(126px + var(--safe-right));
-  width: 42px;
-  height: 42px;
+  bottom: calc(160px + var(--safe-bottom));
+  right: calc(134px + var(--safe-right));
+  width: 44px;
+  height: 44px;
   border-color: rgba(255, 215, 0, 0.65);
   z-index: 72;
 }
@@ -504,22 +502,23 @@ html, body, #app {
   padding: 1px 3px !important;
 }
 
-/* 兵装強化ステータスバッジ: レーダーのすぐ左に十分な横幅（205-225px）を確保した2列グリッド */
+/* 兵装強化ステータスバッジ: レーダーのすぐ左にワイドな横幅（265-285px）を確保した2列グリッド */
 #hud-upgrades-bar {
   display: flex !important;
   flex-direction: column !important;
   gap: 2px !important;
-  padding: 3px 6px !important;
-  background: rgba(6, 12, 24, 0.72) !important;
-  border: 1px solid rgba(0, 243, 255, 0.25) !important;
+  padding: 3px 8px !important;
+  background: rgba(6, 12, 24, 0.78) !important;
+  border: 1px solid rgba(0, 243, 255, 0.28) !important;
   border-radius: 5px !important;
-  min-width: 205px !important;
-  max-width: 225px !important;
+  min-width: 265px !important;
+  max-width: 285px !important;
+  width: 275px !important;
 }
 
 #hud-upgrades-bar .hud-label {
   display: block !important;
-  font-size: 7.5px !important;
+  font-size: 8px !important;
   color: var(--neon-cyan) !important;
   margin-bottom: 2px !important;
   white-space: nowrap !important;
@@ -528,13 +527,13 @@ html, body, #app {
 .upgrade-badges-row {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
-  gap: 2px 6px !important;
+  gap: 2.5px 8px !important;
   width: 100% !important;
 }
 
 .upgrade-badge, .status-badge {
-  font-size: 7.5px !important;
-  padding: 1.5px 4px !important;
+  font-size: 8px !important;
+  padding: 2px 5px !important;
   border-radius: 3px !important;
   line-height: 1.1 !important;
   white-space: nowrap !important;
@@ -542,28 +541,29 @@ html, body, #app {
   box-sizing: border-box !important;
 }
 
-/* 3. HUD BOTTOM LEFT (サイバーシールド・HP・スタミナ・バレットタイム: 横幅76pxまで極小化) */
+/* 3. HUD VITALS DISPLAY (一時停止ボタンの下・性能モニタの上に配置し、読みやすく再設計) */
 #hud-bottom-left {
   position: absolute !important;
-  bottom: calc(6px + var(--safe-bottom)) !important;
+  top: calc(44px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
-  width: 76px !important;
-  max-width: 76px !important;
+  bottom: auto !important;
+  width: 106px !important;
+  max-width: 106px !important;
   z-index: 45 !important;
-  pointer-events: none !important; /* ジョイスティック操作を一切阻害しない */
-  transform: scale(0.72) !important;
-  transform-origin: bottom left !important;
+  pointer-events: none !important;
+  transform: none !important;
 }
 
 #hud-bottom-left .vitals-panel {
-  padding: 2px 4px !important;
-  background: rgba(6, 12, 24, 0.7) !important;
+  padding: 3px 6px !important;
+  background: rgba(6, 12, 24, 0.82) !important;
   border-radius: 4px !important;
-  border: 1px solid rgba(0, 243, 255, 0.2) !important;
+  border: 1px solid rgba(0, 243, 255, 0.3) !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 1.5px !important;
-  width: 76px !important;
+  gap: 2px !important;
+  width: 106px !important;
+  box-sizing: border-box !important;
 }
 
 #hud-bottom-left .vital-row {
@@ -574,33 +574,34 @@ html, body, #app {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  font-size: 6px !important;
+  font-size: 7.5px !important;
   line-height: 1 !important;
   margin-bottom: 1px !important;
 }
 
 #hud-bottom-left .vital-icon {
-  font-size: 6px !important;
-  margin-right: 1px !important;
+  font-size: 7.5px !important;
+  margin-right: 2px !important;
 }
 
 #hud-bottom-left .vital-name {
-  font-size: 5.8px !important;
-  letter-spacing: 0px !important;
+  font-size: 7px !important;
+  letter-spacing: 0.2px !important;
+  font-weight: 700 !important;
 }
 
 #hud-bottom-left .vital-num {
-  font-size: 5.8px !important;
+  font-size: 7px !important;
   font-family: var(--font-mono) !important;
 }
 
 #hud-bottom-left .bar-track {
-  height: 2.5px !important;
-  border-radius: 1px !important;
+  height: 3px !important;
+  border-radius: 1.5px !important;
 }
 
 #hud-bottom-left .bar-track.tiny {
-  height: 1.8px !important;
+  height: 2px !important;
 }
 
 /* 4. HUD BOTTOM RIGHT (武器スロット ＆ 弾薬パネル) - 画面最下部中央に配置し、武器名領域をワイド拡張 */
@@ -658,49 +659,54 @@ html, body, #app {
   background: rgba(0, 243, 255, 0.22) !important;
 }
 
-/* 弾薬パネル: 横幅を175pxに拡大し、武器名が1行で綺麗に収まるようワイド化 */
+/* 弾薬パネル: 横幅を230pxに拡大し、武器名が1行で綺麗に収まるようワイド化 */
 .ammo-panel {
   pointer-events: auto !important;
   cursor: pointer !important;
-  padding: 3px 8px !important;
-  background: rgba(8, 14, 28, 0.88) !important;
-  border: 1px solid rgba(0, 243, 255, 0.35) !important;
+  padding: 3px 10px !important;
+  background: rgba(8, 14, 28, 0.9) !important;
+  border: 1.5px solid rgba(0, 243, 255, 0.4) !important;
   border-radius: 6px !important;
-  min-width: 175px !important;
-  width: 175px !important;
+  min-width: 230px !important;
+  width: 230px !important;
 }
 
 .ammo-header {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 6px !important;
-  font-size: 9.5px !important;
+  gap: 8px !important;
+  font-size: 10px !important;
   white-space: nowrap !important;
 }
 
 #hud-current-weapon-name {
-  font-size: 13px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
   white-space: nowrap !important;
   letter-spacing: 0.5px !important;
 }
 
 .ammo-readout {
-  font-size: 17px !important;
+  font-size: 18px !important;
 }
 
 .ammo-canvas-display {
   display: block !important;
-  width: 170px !important;
-  height: 11px !important;
+  width: 222px !important;
+  height: 12px !important;
 }
 
-/* Boss HUD on Mobile */
-.boss-hud-container {
-  top: calc(44px + var(--safe-top)) !important;
-  width: 60vw !important;
-  max-width: 380px !important;
-  transform: scale(0.9) !important;
+/* Boss HUD on Mobile: 画面中央上部に完全センタリング */
+#boss-hud-container, .boss-hud-container {
+  position: absolute !important;
+  top: calc(40px + var(--safe-top)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) scale(0.85) !important;
+  transform-origin: top center !important;
+  width: min(440px, 80vw) !important;
+  max-width: 80vw !important;
+  z-index: 85 !important;
 }
 
 /* ================= 照準レティクル (全画面/PWA 完全真円中心同期) ================= */
@@ -864,41 +870,52 @@ html, body, #app {
   transform: translateX(22px);
 }
 
-/* ================= 性能テレメトリモニタ (一時停止ボタンすぐ横・左端揃え) ================= */
+/* ================= 性能テレメトリモニタ (バイタル表示の直下・2行表示) ================= */
 .perf-monitor-hud {
   position: absolute !important;
-  top: calc(44px + var(--safe-top)) !important;
+  top: calc(108px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
-  transform: scale(0.78) !important;
-  transform-origin: top left !important;
-  padding: 2px 6px !important;
-  gap: 6px !important;
-  font-size: 8.5px !important;
-  background: rgba(6, 12, 22, 0.85) !important;
+  display: grid !important;
+  grid-template-columns: auto auto !important;
+  gap: 2px 6px !important;
+  padding: 2.5px 6px !important;
+  font-size: 8px !important;
+  background: rgba(6, 12, 22, 0.88) !important;
   border: 1px solid rgba(0, 243, 255, 0.35) !important;
   border-radius: 4px !important;
   z-index: 91 !important;
   pointer-events: none !important;
   white-space: nowrap !important;
+  width: 106px !important;
+  box-sizing: border-box !important;
+  transform: none !important;
 }
 
 .perf-item {
-  gap: 2px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
 }
 
 .perf-lbl {
-  font-size: 8px !important;
+  font-size: 7.5px !important;
+  color: #64748b !important;
 }
 
-/* ================= ピックアップ通知トースト (一時停止ボタンと同じ左端・小型化) ================= */
+.perf-val {
+  font-size: 8px !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* ================= ピックアップ通知トースト (性能モニタ直下・左端揃え) ================= */
 #pickup-toast-container {
   position: absolute !important;
-  top: calc(72px + var(--safe-top)) !important;
+  top: calc(146px + var(--safe-top)) !important;
   left: calc(8px + var(--safe-left)) !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 3px !important;
-  max-height: calc(100vh - 120px) !important;
+  max-height: calc(100vh - 160px) !important;
   overflow: hidden !important;
   align-items: flex-start !important;
   pointer-events: none !important;
@@ -971,4 +988,147 @@ html, body, #app {
   box-sizing: border-box !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6) !important;
   transition: font-size 0.1s ease !important;
+}
+
+/* ================= HUD ボタン配置・サイズカスタマイザー ================= */
+body.hud-editing #touch-controls-layer {
+  z-index: 250 !important;
+  pointer-events: auto !important;
+}
+
+body.hud-editing .touch-action-group .touch-btn {
+  outline: 2px dashed rgba(0, 243, 255, 0.75) !important;
+  outline-offset: 3px !important;
+  touch-action: none !important;
+  cursor: move !important;
+  box-shadow: 0 0 16px rgba(0, 243, 255, 0.5) !important;
+}
+
+body.hud-editing .touch-action-group .touch-btn.custom-selected {
+  outline: 3px dashed #ffd700 !important;
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.85) !important;
+}
+
+#hud-custom-editor {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+  z-index: 280 !important;
+}
+
+#hud-custom-editor.hidden {
+  display: none !important;
+}
+
+.hud-custom-backdrop {
+  position: absolute !important;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.hud-custom-bar {
+  position: absolute !important;
+  top: calc(8px + var(--safe-top)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(92vw, 640px) !important;
+  background: rgba(8, 14, 28, 0.95) !important;
+  border: 1.5px solid #00f3ff !important;
+  box-shadow: 0 0 25px rgba(0, 243, 255, 0.45) !important;
+  border-radius: 8px !important;
+  padding: 8px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  pointer-events: auto !important;
+  backdrop-filter: blur(10px) !important;
+  box-sizing: border-box !important;
+}
+
+.hud-custom-col {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.hud-custom-col.info-col {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 2px !important;
+}
+
+.hud-custom-badge {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: var(--neon-cyan) !important;
+  letter-spacing: 0.5px !important;
+}
+
+.hud-custom-target {
+  font-size: 9.5px !important;
+  color: #ffd700 !important;
+  white-space: nowrap !important;
+}
+
+.hud-custom-col.size-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 130px !important;
+}
+
+.hud-size-lbl {
+  font-size: 9.5px !important;
+  color: #cbd5e1 !important;
+  white-space: nowrap !important;
+}
+
+#hud-custom-size-display {
+  color: #00f3ff !important;
+  font-weight: 700 !important;
+  font-family: var(--font-mono) !important;
+}
+
+#hud-custom-size-slider {
+  width: 100% !important;
+  height: 6px !important;
+  accent-color: #00f3ff !important;
+  cursor: pointer !important;
+}
+
+.hud-custom-col.btn-col {
+  gap: 6px !important;
+}
+
+.btn-custom-sub {
+  padding: 6px 10px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #cbd5e1 !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.btn-custom-main {
+  padding: 6px 14px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  background: rgba(0, 243, 255, 0.25) !important;
+  border: 1.5px solid #00f3ff !important;
+  color: #00f3ff !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
+  white-space: nowrap !important;
+}
+
+.btn-custom-main:active {
+  transform: scale(0.95) !important;
 }

@@ -878,8 +878,10 @@ export class EnemyBoss extends EnemyHumanoid {
     this.missileCooldown = 6.0;
     this.missileTimer = 3.0;
     this.altBarrel = false;
-    this.deathTimer = 2.4;
-    this.deathExplosionTimer = 0.2;
+    this.deathTimer = 1.1;
+    this.deathExplosionTimer = 0.05;
+    this.deathExplosionsTriggered = 0;
+    this.maxDeathExplosions = 3;
     if (!this.wingMeshes) this.wingMeshes = [];
 
     if (this.hpBg && this.hpFill) {
@@ -1569,7 +1571,17 @@ export class EnemyBoss extends EnemyHumanoid {
 
     if (this.health <= 0) {
       this.isDying = true;
-      this.deathTimer = 2.4;
+      this.deathTimer = 1.1;
+      this.deathExplosionTimer = 0.05;
+      this.deathExplosionsTriggered = 0;
+      this.maxDeathExplosions = 3;
+      // 討伐開始と同時に被弾判定（当たり判定）を即座に消去
+      this.targetMeshes = [];
+      if (this.bodyGroup) {
+        this.bodyGroup.traverse((obj) => {
+          if (obj.userData) delete obj.userData.enemy;
+        });
+      }
       return true;
     }
 
@@ -1628,19 +1640,20 @@ export class EnemyBoss extends EnemyHumanoid {
       this.deathTimer -= delta;
       this.deathExplosionTimer -= delta;
 
-      if (this.deathExplosionTimer <= 0) {
-        this.deathExplosionTimer = 0.22;
+      if (this.deathExplosionTimer <= 0 && this.deathExplosionsTriggered < this.maxDeathExplosions) {
+        this.deathExplosionTimer = 0.35;
+        this.deathExplosionsTriggered++;
         const offset = new THREE.Vector3(
-          (Math.random() - 0.5) * 3.5,
-          Math.random() * 3.5,
-          (Math.random() - 0.5) * 3.5
+          (Math.random() - 0.5) * 3.2,
+          Math.random() * 3.2,
+          (Math.random() - 0.5) * 3.2
         );
         const expPos = this.mesh.position.clone().add(offset);
         this.particles.createExplosion(expPos, Math.random() > 0.5 ? 0xff0044 : 0xffaa00);
         this.audio.playExplosion(this.mesh.position.distanceTo(playerPos));
       }
 
-      this.mesh.position.y = Math.max(0.4, this.mesh.position.y - delta * 1.2);
+      this.mesh.position.y = Math.max(0.4, this.mesh.position.y - delta * 1.4);
       this.mesh.rotation.z += delta * 0.4;
 
       if (this.deathTimer <= 0) {

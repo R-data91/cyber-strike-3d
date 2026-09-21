@@ -443,6 +443,9 @@
             <span class="btn-glitch"></span>
             <span class="btn-text">作戦開始 [タップして出撃]</span>
           </button>
+          <button id="btn-start-custom-hud" class="btn-cyber-secondary" style="border-color: #00f3ff; color: #00f3ff; font-weight: 800; padding: 12px 20px;">
+            🎮 ボタン配置・サイズ設定
+          </button>
           <button id="btn-start-ex" class="btn-cyber-secondary" style="border-color: #ffd700; color: #ffd700; box-shadow: 0 0 16px rgba(255, 215, 0, 0.45); font-weight: 800; padding: 12px 20px;">
             🚀 EXステージ直行 [STAGE 100体験]
           </button>
@@ -496,6 +499,9 @@
           <button id="btn-resume-game" class="btn-cyber-primary">作戦を再開する</button>
           <button id="btn-restart-game" class="btn-cyber-secondary">最初からやり直す</button>
         </div>
+        <button id="btn-pause-custom-hud" class="btn-cyber-secondary" style="border-color: #00f3ff; color: #00f3ff; width: 100%; margin-top: 8px; font-weight: 800;">
+          🎮 ボタン配置・サイズ設定 (HUDカスタム)
+        </button>
         <button id="btn-pause-ex" class="btn-cyber-secondary" style="border-color: #ffd700; color: #ffd700; width: 100%; margin-top: 8px; font-weight: 800;">
           🚀 EXステージへワープ
         </button>
@@ -507,6 +513,25 @@
           <a href="../" class="btn-cyber-secondary" style="flex: 1; font-size: 11px; padding: 7px 10px; border-color: rgba(255, 255, 255, 0.3); color: #fff; text-align: center; text-decoration: none;">
             💻 PC版へ
           </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= HUDボタン配置・サイズカスタマイザー ================= -->
+    <div id="hud-custom-editor" class="hidden">
+      <div class="hud-custom-backdrop"></div>
+      <div class="hud-custom-bar">
+        <div class="hud-custom-col info-col">
+          <span class="hud-custom-badge">🎮 HUDカスタマイズ</span>
+          <span id="hud-custom-target-name" class="hud-custom-target">ボタンをドラッグで移動 / タップで選択</span>
+        </div>
+        <div class="hud-custom-col size-col">
+          <label class="hud-size-lbl" for="hud-custom-size-slider">サイズ: <span id="hud-custom-size-display">100%</span></label>
+          <input type="range" id="hud-custom-size-slider" min="65" max="160" step="5" value="100">
+        </div>
+        <div class="hud-custom-col btn-col">
+          <button id="btn-hud-custom-reset" class="btn-custom-sub">初期化</button>
+          <button id="btn-hud-custom-save" class="btn-custom-main">保存して完了</button>
         </div>
       </div>
     </div>

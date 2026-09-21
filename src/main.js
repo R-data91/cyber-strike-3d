@@ -1402,6 +1402,96 @@ export class CyberStrikeGame {
       bobTime: Math.random() * Math.PI,
       // 永続化: 消滅タイマーを撤廃し、拾うまで戦利品が消えない
     });
+
+    // フィールド上に50以上のアイテムが置かれている時、50を超えた分を古いものから自動回収
+    this.checkExcessPickups();
+  }
+
+  // 戦利品コンテナの獲得効果適用 (通常拾得 & 余剰自動回収 共通)
+  applyPickup(p, isAuto = false) {
+    if (!p) return;
+    if (p.type === 'health') {
+      this.player.health = Math.min(this.player.maxHealth, this.player.health + 35);
+      this.player.addShield(25);
+      this.audio.playPickup(true);
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00ff88, 18);
+      this.hud.showPickupToast(isAuto ? '【自動回収】医療物資 HP+35 & シールド+25！' : '【医療物資】HP+35 & シールド+25 回復！', 'health');
+    } else if (p.type === 'shield_core') {
+      this.player.addShield(75);
+      this.audio.playPickup(true);
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00f3ff, 24);
+      this.hud.showPickupToast(isAuto ? `【自動回収】シールド+75獲得！ (${Math.ceil(this.player.shield)} / ${this.player.maxShield})` : `【シールドチャージャー】シールド+75獲得！ (${Math.ceil(this.player.shield)} / ${this.player.maxShield})`, 'ammo');
+      if (!isAuto) this.hud.showAnnouncement('🛡️ サイバーシールド展開！ (+75)', 1800);
+    } else if (p.type === 'damage_core') {
+      const mult = this.player.upgradeDamage(0.10);
+      this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xd946ef, 24);
+      this.hud.showPickupToast(isAuto ? `【自動回収】威力強化コア +10%！ (x${mult.toFixed(2)})` : `【威力強化コア】全武器の威力 +10.0% 強化！ (現在: x${mult.toFixed(2)})`, 'upgrade-dmg');
+      this.hud.showAnnouncement(`⚡ 兵装威力強化 Lv.${this.player.damageUpgradeLevel} 獲得！ (威力 x${mult.toFixed(2)})`, 2000);
+    } else if (p.type === 'mag_core') {
+      this.player.upgradeMagazine(4, 1, 1, 6, 1, 15);
+      this.audio.playReload();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xf59e0b, 24);
+      this.hud.showPickupToast(isAuto ? '【自動回収】弾倉拡張モジュール適用！' : '【弾倉拡張モジュール】全6武器の装弾数を拡張！', 'upgrade-mag');
+      this.hud.showAnnouncement(`🔋 弾倉拡張 Lv.${this.player.magUpgradeLevel} 適用！`, 2000);
+    } else if (p.type === 'fire_rate_core') {
+      const mult = this.player.upgradeFireRate(0.12);
+      this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xff3b00, 26);
+      this.hud.showPickupToast(isAuto ? `【自動回収】連射加速コア +12%！ (x${mult.toFixed(2)})` : `【連射加速コア】全武器の連射速度 +12.0% 向上！ (現在: x${mult.toFixed(2)})`, 'upgrade-rate');
+      this.hud.showAnnouncement(`🔥 連射速度強化 Lv.${this.player.fireRateUpgradeLevel} 適用！ (連射 x${mult.toFixed(2)})`, 2000);
+    } else if (p.type === 'hit_range_core') {
+      const r = this.player.upgradeHitRange(0.25);
+      this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00f3ff, 26);
+      this.hud.showPickupToast(isAuto ? `【自動回収】攻撃範囲強化コア +25cm！` : `【攻撃範囲強化コア】弾道誘導許容 +25cm！ (現在: +${Math.round(r * 100)}cm)`, 'upgrade-range');
+      this.hud.showAnnouncement(`🎯 攻撃範囲強化 Lv.${this.player.hitRangeUpgradeLevel} 適用！`, 2000);
+    } else if (p.type === 'speed_core') {
+      const s = this.player.upgradeSpeed(0.01);
+      this.audio.playSlide();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x22c55e, 26);
+      this.hud.showPickupToast(isAuto ? `【自動回収】機動ブースターコア +1%！` : `【機動ブースターコア】全移動速度 +1.0% 向上！ (現在: x${s.toFixed(2)})`, 'upgrade-speed');
+      this.hud.showAnnouncement(`⚡ 機動ブースター Lv.${this.player.speedUpgradeLevel} 適用！`, 2000);
+    } else if (p.type === 'invincible_core') {
+      this.player.activateInvincibility(5.0);
+      this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xffd700, 36);
+      this.hud.showPickupToast(isAuto ? '【自動回収】無敵バリアコア +5秒蓄積！' : '【無敵バリアコア】5秒間 全ダメージ完全無効化！', 'upgrade-invincible');
+      this.hud.showAnnouncement(`🛡️【無敵バリア蓄積】持続時間: ${this.player.invincibleTimer.toFixed(1)}秒！`, 2500);
+    } else if (p.type === 'drop_rate_core') {
+      const d = this.player.upgradeDropRate(0.05);
+      this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x10b981, 26);
+      this.hud.showPickupToast(isAuto ? `【自動回収】ドロップ率強化コア +5%！` : `【ドロップ率強化コア】アイテムドロップ率 +5%！ (現在: +${Math.round(d * 100)}%)`, 'upgrade-drop');
+      this.hud.showAnnouncement(`💎 ドロップ率強化 Lv.${this.player.dropRateUpgradeLevel} 適用！`, 2000);
+    } else if (p.type === 'double_drop_core') {
+      const db = this.player.upgradeDoubleDrop(0.35);
+      this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xfbbf24, 28);
+      this.hud.showPickupToast(isAuto ? `【自動回収】倍ドロップコア +35%！` : `【倍ドロップコア】2個ドロップ発生率 +35%！ (現在: ${Math.round(db * 100)}%)`, 'upgrade-double-drop');
+      this.hud.showAnnouncement(`✨ 倍ドロップ確率 Lv.${this.player.doubleDropUpgradeLevel} 適用！`, 2000);
+    } else {
+      // ammo
+      this.player.addAmmoToAll(45, 12, 3, 60, 3, 90);
+      this.player.grenades += 1;
+      this.audio.playPickup(false);
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00f3ff, 18);
+      this.hud.showPickupToast(isAuto ? '【自動回収】弾薬コンテナ＋手榴弾+1！' : '【弾薬コンテナ】全6武器の予備弾薬＋手榴弾+1 獲得！', 'ammo');
+    }
+
+    if (p.mesh) {
+      this.engine.scene.remove(p.mesh);
+      disposeHierarchy(p.mesh);
+    }
+  }
+
+  // フィールド上に50以上のアイテムが置かれている時、50を超えた分を古いものから自動回収
+  checkExcessPickups() {
+    const MAX_FIELD_PICKUPS = 50;
+    while (this.pickups.length > MAX_FIELD_PICKUPS) {
+      const excess = this.pickups.shift();
+      this.applyPickup(excess, true);
+    }
   }
 
   // 3D戦術アイテムコンテナの更新 & 拾得処理
@@ -1416,82 +1506,13 @@ export class CyberStrikeGame {
 
       const dist = p.mesh.position.distanceTo(playerPos);
       if (dist < 2.2) {
-        if (p.type === 'health') {
-          this.player.health = Math.min(this.player.maxHealth, this.player.health + 35);
-          this.player.addShield(25);
-          this.audio.playPickup(true);
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00ff88, 18);
-          this.hud.showPickupToast('【医療物資】HP+35 & シールド+25 回復！', 'health');
-        } else if (p.type === 'shield_core') {
-          this.player.addShield(75);
-          this.audio.playPickup(true);
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00f3ff, 24);
-          this.hud.showPickupToast(`【シールドチャージャー】シールド+75獲得！ (${Math.ceil(this.player.shield)} / ${this.player.maxShield})`, 'ammo');
-          this.hud.showAnnouncement('🛡️ サイバーシールド展開！ (+75)', 1800);
-        } else if (p.type === 'damage_core') {
-          const mult = this.player.upgradeDamage(0.10);
-          this.audio.playBuffPickup();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xd946ef, 24);
-          this.hud.showPickupToast(`【威力強化コア】全武器の威力 +10.0% 強化！ (現在: x${mult.toFixed(2)})`, 'upgrade-dmg');
-          this.hud.showAnnouncement(`⚡ 兵装威力強化 Lv.${this.player.damageUpgradeLevel} 獲得！ (威力 x${mult.toFixed(2)})`, 2000);
-        } else if (p.type === 'mag_core') {
-          this.player.upgradeMagazine(4, 1, 1, 6, 1, 15);
-          this.audio.playReload();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xf59e0b, 24);
-          this.hud.showPickupToast('【弾倉拡張モジュール】全6武器の装弾数を拡張！', 'upgrade-mag');
-          this.hud.showAnnouncement(`🔋 弾倉拡張 Lv.${this.player.magUpgradeLevel} 適用！`, 2000);
-        } else if (p.type === 'fire_rate_core') {
-          const mult = this.player.upgradeFireRate(0.12);
-          this.audio.playBuffPickup();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xff3b00, 26);
-          this.hud.showPickupToast(`【連射加速コア】全武器の連射速度 +12.0% 向上！ (現在: x${mult.toFixed(2)})`, 'upgrade-rate');
-          this.hud.showAnnouncement(`🔥 連射速度強化 Lv.${this.player.fireRateUpgradeLevel} 適用！ (連射 x${mult.toFixed(2)})`, 2000);
-        } else if (p.type === 'hit_range_core') {
-          const r = this.player.upgradeHitRange(0.25);
-          this.audio.playBuffPickup();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00f3ff, 26);
-          this.hud.showPickupToast(`【攻撃範囲強化コア】弾道誘導許容 +25cm！ (現在: +${Math.round(r * 100)}cm)`, 'upgrade-range');
-          this.hud.showAnnouncement(`🎯 攻撃範囲強化 Lv.${this.player.hitRangeUpgradeLevel} 適用！`, 2000);
-        } else if (p.type === 'speed_core') {
-          const s = this.player.upgradeSpeed(0.01);
-          this.audio.playSlide();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x22c55e, 26);
-          this.hud.showPickupToast(`【機動ブースターコア】全移動速度 +1.0% 向上！ (現在: x${s.toFixed(2)})`, 'upgrade-speed');
-          this.hud.showAnnouncement(`⚡ 機動ブースター Lv.${this.player.speedUpgradeLevel} 適用！`, 2000);
-        } else if (p.type === 'invincible_core') {
-          this.player.activateInvincibility(5.0);
-          this.audio.playBuffPickup();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xffd700, 36);
-          this.hud.showPickupToast('【無敵バリアコア】5秒間 全ダメージ完全無効化！', 'upgrade-invincible');
-          this.hud.showAnnouncement('🛡️【完全無敵バリア発動】5秒間 全ダメージ無効化！', 2500);
-        } else if (p.type === 'drop_rate_core') {
-          const d = this.player.upgradeDropRate(0.05);
-          this.audio.playBuffPickup();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x10b981, 26);
-          this.hud.showPickupToast(`【ドロップ率強化コア】アイテムドロップ率 +5%！ (現在: +${Math.round(d * 100)}%)`, 'upgrade-drop');
-          this.hud.showAnnouncement(`💎 ドロップ率強化 Lv.${this.player.dropRateUpgradeLevel} 適用！`, 2000);
-        } else if (p.type === 'double_drop_core') {
-          const db = this.player.upgradeDoubleDrop(0.35);
-          this.audio.playBuffPickup();
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xfbbf24, 28);
-          this.hud.showPickupToast(`【倍ドロップコア】2個ドロップ発生率 +35%！ (現在: ${Math.round(db * 100)}%)`, 'upgrade-double-drop');
-          this.hud.showAnnouncement(`✨ 倍ドロップ確率 Lv.${this.player.doubleDropUpgradeLevel} 適用！`, 2000);
-        } else {
-          // ammo
-          this.player.addAmmoToAll(45, 12, 3, 60, 3, 90);
-          this.player.grenades += 1;
-          this.audio.playPickup(false);
-          this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00f3ff, 18);
-          this.hud.showPickupToast('【弾薬コンテナ】全6武器の予備弾薬＋手榴弾+1 獲得！', 'ammo');
-        }
-
-        this.engine.scene.remove(p.mesh);
-        disposeHierarchy(p.mesh);
+        this.applyPickup(p, false);
         this.pickups.splice(i, 1);
         continue;
       }
       // 戦利品が消えないように時間経過による消滅判定は行わない
     }
+    this.checkExcessPickups();
   }
 
   // 戦術手榴弾の物理挙動 & 誘爆

@@ -57,6 +57,9 @@ class MobileCyberStrikeApp {
 
     // 8. Prevent accidental gestures (pinch-zoom, bounce scroll)
     this.preventAccidentalGestures();
+
+    // 9. Setup HUD Customizer (Position drag & drop, size slider, persistence)
+    this.setupHudCustomizer();
   }
 
   setupAudioUnlock() {
@@ -195,6 +198,241 @@ class MobileCyberStrikeApp {
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('gesturechange', (e) => e.preventDefault());
     document.addEventListener('gestureend', (e) => e.preventDefault());
+  }
+
+  setupHudCustomizer() {
+    const HUD_BUTTONS = [
+      { id: 'btn-fire', name: '射撃 (FIRE)', defaultW: 94, defaultH: 94 },
+      { id: 'btn-jump', name: 'ジャンプ (JUMP)', defaultW: 54, defaultH: 54 },
+      { id: 'btn-crouch', name: 'スライド (SLIDE)', defaultW: 50, defaultH: 50 },
+      { id: 'btn-ads', name: '照準 (ADS)', defaultW: 52, defaultH: 52 },
+      { id: 'btn-reload', name: 'リロード (RELOAD)', defaultW: 46, defaultH: 46 },
+      { id: 'btn-grenade', name: '手榴弾 (GRENADE)', defaultW: 44, defaultH: 44 },
+      { id: 'btn-bullet-time', name: 'バレットタイム (TIME)', defaultW: 44, defaultH: 44 },
+    ];
+
+    const STORAGE_KEY = 'cyber_strike_mobile_hud_layout_v2';
+    let currentLayout = {};
+    let selectedBtnDef = HUD_BUTTONS[0];
+    let originModal = null;
+
+    // 1. Load persisted layout from localStorage
+    const loadSavedLayout = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          currentLayout = JSON.parse(raw);
+          applyAllLayout();
+        }
+      } catch (e) {
+        console.warn('Failed to load HUD layout:', e);
+      }
+    };
+
+    const applyAllLayout = () => {
+      HUD_BUTTONS.forEach((b) => {
+        const el = document.getElementById(b.id);
+        if (!el) return;
+        const conf = currentLayout[b.id];
+        if (conf) {
+          if (conf.right !== undefined) el.style.right = `${conf.right}px`;
+          if (conf.bottom !== undefined) el.style.bottom = `${conf.bottom}px`;
+          if (conf.width !== undefined) el.style.width = `${conf.width}px`;
+          if (conf.height !== undefined) el.style.height = `${conf.height}px`;
+          if (conf.scale !== undefined) el.dataset.hudScale = conf.scale;
+        }
+      });
+    };
+
+    const resetLayout = () => {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+      currentLayout = {};
+      HUD_BUTTONS.forEach((b) => {
+        const el = document.getElementById(b.id);
+        if (el) {
+          el.style.right = '';
+          el.style.bottom = '';
+          el.style.width = '';
+          el.style.height = '';
+          delete el.dataset.hudScale;
+        }
+      });
+      if (slider) slider.value = 100;
+      if (sizeDisplay) sizeDisplay.textContent = '100%';
+    };
+
+    // UI elements
+    const editor = document.getElementById('hud-custom-editor');
+    const targetName = document.getElementById('hud-custom-target-name');
+    const slider = document.getElementById('hud-custom-size-slider');
+    const sizeDisplay = document.getElementById('hud-custom-size-display');
+    const btnReset = document.getElementById('btn-hud-custom-reset');
+    const btnSave = document.getElementById('btn-hud-custom-save');
+
+    const btnStartCustom = document.getElementById('btn-start-custom-hud');
+    const btnPauseCustom = document.getElementById('btn-pause-custom-hud');
+    const startScreen = document.getElementById('start-screen');
+    const pauseScreen = document.getElementById('pause-screen');
+
+    const selectButton = (btnDef) => {
+      selectedBtnDef = btnDef;
+      HUD_BUTTONS.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (el) {
+          if (b.id === btnDef.id) el.classList.add('custom-selected');
+          else el.classList.remove('custom-selected');
+        }
+      });
+      if (targetName) targetName.textContent = `選択中: [${btnDef.name}]`;
+      const currentScale = currentLayout[btnDef.id]?.scale || 100;
+      if (slider) slider.value = currentScale;
+      if (sizeDisplay) sizeDisplay.textContent = `${currentScale}%`;
+    };
+
+    const openEditor = (fromModal) => {
+      originModal = fromModal;
+      if (originModal) originModal.classList.add('hidden');
+      document.body.classList.add('hud-editing');
+      if (editor) editor.classList.remove('hidden');
+      selectButton(HUD_BUTTONS[0]);
+    };
+
+    const closeEditor = (save = true) => {
+      if (save) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(currentLayout));
+        } catch (e) {}
+      }
+      document.body.classList.remove('hud-editing');
+      HUD_BUTTONS.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (el) el.classList.remove('custom-selected');
+      });
+      if (editor) editor.classList.add('hidden');
+      if (originModal) originModal.classList.remove('hidden');
+      originModal = null;
+    };
+
+    if (btnStartCustom) btnStartCustom.addEventListener('click', () => openEditor(startScreen));
+    if (btnPauseCustom) btnPauseCustom.addEventListener('click', () => openEditor(pauseScreen));
+
+    if (btnSave) btnSave.addEventListener('click', () => closeEditor(true));
+    if (btnReset) btnReset.addEventListener('click', () => resetLayout());
+
+    // Slider for scale
+    if (slider) {
+      slider.addEventListener('input', (e) => {
+        if (!selectedBtnDef) return;
+        const scale = parseInt(e.target.value, 10);
+        if (sizeDisplay) sizeDisplay.textContent = `${scale}%`;
+        const el = document.getElementById(selectedBtnDef.id);
+        if (!el) return;
+        const newW = Math.round(selectedBtnDef.defaultW * (scale / 100));
+        const newH = Math.round(selectedBtnDef.defaultH * (scale / 100));
+        el.style.width = `${newW}px`;
+        el.style.height = `${newH}px`;
+        el.dataset.hudScale = scale;
+        if (!currentLayout[selectedBtnDef.id]) currentLayout[selectedBtnDef.id] = {};
+        currentLayout[selectedBtnDef.id].width = newW;
+        currentLayout[selectedBtnDef.id].height = newH;
+        currentLayout[selectedBtnDef.id].scale = scale;
+      });
+    }
+
+    // Touch & Pointer Drag for Buttons
+    HUD_BUTTONS.forEach((btnDef) => {
+      const el = document.getElementById(btnDef.id);
+      if (!el) return;
+
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let initRight = 0;
+      let initBottom = 0;
+
+      const onDragStart = (clientX, clientY) => {
+        if (!document.body.classList.contains('hud-editing')) return false;
+        selectButton(btnDef);
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        const rect = el.getBoundingClientRect();
+        initRight = window.innerWidth - rect.right;
+        initBottom = window.innerHeight - rect.bottom;
+        return true;
+      };
+
+      const onDragMove = (clientX, clientY) => {
+        if (!isDragging) return;
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+
+        // Since origin is bottom-right:
+        // Moving right (positive dx) means right decreases.
+        // Moving down (positive dy) means bottom decreases.
+        const elW = el.offsetWidth || btnDef.defaultW;
+        const elH = el.offsetHeight || btnDef.defaultH;
+
+        const maxRight = window.innerWidth - elW - 6;
+        const maxBottom = window.innerHeight - elH - 6;
+
+        const newRight = Math.max(6, Math.min(maxRight, initRight - dx));
+        const newBottom = Math.max(6, Math.min(maxBottom, initBottom - dy));
+
+        el.style.right = `${Math.round(newRight)}px`;
+        el.style.bottom = `${Math.round(newBottom)}px`;
+
+        if (!currentLayout[btnDef.id]) currentLayout[btnDef.id] = {};
+        currentLayout[btnDef.id].right = Math.round(newRight);
+        currentLayout[btnDef.id].bottom = Math.round(newBottom);
+      };
+
+      const onDragEnd = () => {
+        isDragging = false;
+      };
+
+      el.addEventListener('touchstart', (e) => {
+        if (!document.body.classList.contains('hud-editing')) return;
+        const t = e.touches[0];
+        if (onDragStart(t.clientX, t.clientY)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, { passive: false });
+
+      el.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const t = e.touches[0];
+        onDragMove(t.clientX, t.clientY);
+        e.preventDefault();
+        e.stopPropagation();
+      }, { passive: false });
+
+      el.addEventListener('touchend', () => onDragEnd(), { passive: true });
+      el.addEventListener('touchcancel', () => onDragEnd(), { passive: true });
+
+      // Pointer events for desktop testing / mouse emulation
+      el.addEventListener('pointerdown', (e) => {
+        if (!document.body.classList.contains('hud-editing')) return;
+        if (onDragStart(e.clientX, e.clientY)) {
+          e.preventDefault();
+          e.stopPropagation();
+          const moveHandler = (ev) => onDragMove(ev.clientX, ev.clientY);
+          const upHandler = () => {
+            onDragEnd();
+            window.removeEventListener('pointermove', moveHandler);
+            window.removeEventListener('pointerup', upHandler);
+          };
+          window.addEventListener('pointermove', moveHandler);
+          window.addEventListener('pointerup', upHandler);
+        }
+      });
+    });
+
+    // Initial load
+    loadSavedLayout();
   }
 }
 

@@ -317,6 +317,7 @@ export class MobileInputManager {
     const bindBtn = (el, onDown, onUp) => {
       if (!el) return;
       el.addEventListener('touchstart', (e) => {
+        if (document.body.classList.contains('hud-editing')) return;
         e.preventDefault();
         e.stopPropagation();
         el.classList.add('pressed');
@@ -336,6 +337,7 @@ export class MobileInputManager {
     const btnFire = this.dom.btnFire;
     if (btnFire) {
       btnFire.addEventListener('touchstart', (e) => {
+        if (document.body.classList.contains('hud-editing')) return;
         e.preventDefault();
         e.stopPropagation();
         btnFire.classList.add('pressed');

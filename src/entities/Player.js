@@ -296,9 +296,9 @@ export class Player {
     }
   }
 
-  // 5秒無敵バリア発動 (戦利品コア)
+  // 5秒無敵バリア発動 (戦利品コア: 拾った個数×秒数で蓄積)
   activateInvincibility(duration = 5.0) {
-    this.invincibleTimer = Math.max(this.invincibleTimer, duration);
+    this.invincibleTimer = (this.invincibleTimer > 0 ? this.invincibleTimer : 0) + duration;
     if (this.invincibleShieldMesh) this.invincibleShieldMesh.visible = true;
     return this.invincibleTimer;
   }
@@ -799,7 +799,7 @@ export class Player {
     // Collect all enemy target meshes
     const enemyMeshes = [];
     enemiesList.forEach(e => {
-      if (!e.isDead) enemyMeshes.push(...e.targetMeshes);
+      if (!e.isDead && !e.isDying) enemyMeshes.push(...e.targetMeshes);
     });
 
     // 2丁モード (3000弾以上) / 3丁モード (6000弾以上) を兵装に設定
