@@ -63,7 +63,7 @@ class MobileCyberStrikeApp {
       const trigger = (e) => {
         if (handled) return;
         handled = true;
-        setTimeout(() => { handled = false; }, 200);
+        setTimeout(() => { handled = false; }, 120);
         if (e.cancelable) e.preventDefault();
         e.stopPropagation();
         onTrigger();
@@ -80,8 +80,18 @@ class MobileCyberStrikeApp {
         if (this.game && this.game.player) {
           this.game.player.switchWeapon(i - 1);
           const w = this.game.player.activeWeapon;
+          // Immediate visual slot highlight update
+          for (let s = 1; s <= 6; s++) {
+            const slotEl = document.getElementById(`slot-${s}`);
+            if (slotEl) {
+              if (s === i) slotEl.classList.add('active');
+              else slotEl.classList.remove('active');
+            }
+          }
           if (this.game.hud) {
             this.game.hud.showPickupToast(`【兵装切替】[${i}] ${w.displayName || w.name}`, 'supply');
+            const nameEl = document.getElementById('hud-current-weapon-name');
+            if (nameEl) nameEl.textContent = w.name;
           }
         }
       });

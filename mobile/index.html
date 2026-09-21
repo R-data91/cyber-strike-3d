@@ -68,6 +68,20 @@
       </div>
     </div>
 
+    <!-- ================= MOBILE TOUCH SURFACES (ジョイスティック & スワイプエイム: HUD背面) ================= -->
+    <div id="touch-surfaces-layer">
+      <!-- 画面左側: バーチャル移動ジョイスティック領域 -->
+      <div id="joystick-zone">
+        <div id="joystick-base">
+          <div class="joystick-sprint-hint">▲ SPRINT</div>
+          <div id="joystick-stick"></div>
+        </div>
+      </div>
+
+      <!-- 画面右側: 視点回転エイムスワイプ領域 -->
+      <div id="aim-zone"></div>
+    </div>
+
     <!-- HUD Overlay -->
     <div id="hud" class="hidden">
       <!-- リアルタイム性能・メモリモニタ -->
@@ -177,15 +191,15 @@
         </div>
       </div>
 
-      <!-- 左下: プレイヤーバイタル (シールド, HP, スタミナ, バレットタイム) -->
+      <!-- 左下: プレイヤーバイタル (シールド, HP, スタミナ, バレットタイム: 超スリム極小化) -->
       <footer id="hud-bottom-left">
         <div class="vitals-panel">
           <!-- シールドバー -->
           <div class="vital-row">
             <div class="vital-meta">
               <span class="vital-icon shield-icon">🛡️</span>
-              <span class="vital-name">サイバーシールド</span>
-              <span class="vital-num" id="hud-shield-text">0 / 200</span>
+              <span class="vital-name">SHIELD</span>
+              <span class="vital-num" id="hud-shield-text">0/200</span>
             </div>
             <div class="bar-track">
               <div id="hud-shield-bar" class="bar-fill shield-fill" style="width: 0%;"></div>
@@ -196,8 +210,8 @@
           <div class="vital-row">
             <div class="vital-meta">
               <span class="vital-icon hp-icon">❤️</span>
-              <span class="vital-name">アーマー / HP</span>
-              <span class="vital-num" id="hud-hp-text">100 / 100</span>
+              <span class="vital-name">HP</span>
+              <span class="vital-num" id="hud-hp-text">100/100</span>
             </div>
             <div class="bar-track">
               <div id="hud-hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div>
@@ -207,7 +221,7 @@
           <!-- ダッシュスタミナバー -->
           <div class="vital-row compact">
             <div class="vital-meta">
-              <span class="vital-name small">ブースタースタミナ</span>
+              <span class="vital-name small">STM</span>
               <span class="vital-num small" id="hud-stamina-text">100%</span>
             </div>
             <div class="bar-track tiny">
@@ -219,7 +233,7 @@
           <div class="vital-row compact adrenaline-row">
             <div class="vital-meta">
               <span class="vital-icon adrenaline-icon">⚡</span>
-              <span class="vital-name small">バレットタイム [Q]</span>
+              <span class="vital-name small">TIME</span>
               <span class="vital-num small" id="hud-adrenaline-text">0%</span>
             </div>
             <div class="bar-track tiny">
@@ -291,19 +305,8 @@
       </footer>
     </div>
 
-    <!-- ================= MOBILE TOUCH CONTROLS LAYER ================= -->
+    <!-- ================= MOBILE ACTION BUTTONS & TOP MENU (HUD最前面) ================= -->
     <div id="touch-controls-layer">
-      <!-- 画面左側: バーチャル移動ジョイスティック領域 -->
-      <div id="joystick-zone">
-        <div id="joystick-base">
-          <div class="joystick-sprint-hint">▲ SPRINT</div>
-          <div id="joystick-stick"></div>
-        </div>
-      </div>
-
-      <!-- 画面右側: 視点回転エイムスワイプ領域 -->
-      <div id="aim-zone"></div>
-
       <!-- 左上システムメニューボタン -->
       <div class="mobile-top-actions">
         <button id="btn-pause" class="mobile-sys-btn" title="ポーズメニュー">⏸️</button>

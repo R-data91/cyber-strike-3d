@@ -615,13 +615,13 @@ export class HUD {
       const tChance = Math.round((player.tripleDropChance || 0) * 100);
       if (tChance > 0) {
         setText(this.badgeDoubleDrop, tChance >= 100 ? '👑 3倍泥: 確定' : `👑 3倍泥: ${tChance}%`);
-        setClassName(this.badgeDoubleDrop, 'status-badge active badge-triple');
+        setClassName(this.badgeDoubleDrop, 'upgrade-badge double-drop active badge-triple');
       } else if (dChance > 0) {
         setText(this.badgeDoubleDrop, dChance >= 100 ? '✨ 倍泥: 確定' : `✨ 倍泥: ${dChance}%`);
-        setClassName(this.badgeDoubleDrop, 'status-badge active');
+        setClassName(this.badgeDoubleDrop, 'upgrade-badge double-drop active');
       } else {
         setText(this.badgeDoubleDrop, `倍泥: なし`);
-        setClassName(this.badgeDoubleDrop, 'status-badge');
+        setClassName(this.badgeDoubleDrop, 'upgrade-badge double-drop');
       }
     }
 

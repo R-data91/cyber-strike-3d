@@ -87,11 +87,11 @@ html, body, #app {
   }
 }
 
-/* ================= TOUCH CONTROLS OVERLAY ================= */
-#touch-controls-layer {
+/* ================= 1. TOUCH SURFACES LAYER (HUD背面: ジョイスティック & エイムスワイプ) ================= */
+#touch-surfaces-layer {
   position: absolute;
   inset: 0;
-  z-index: 40;
+  z-index: 20;
   pointer-events: none;
   overflow: hidden;
 }
@@ -105,7 +105,7 @@ html, body, #app {
   height: 100vh;
   pointer-events: auto;
   touch-action: none;
-  z-index: 42;
+  z-index: 22;
 }
 
 #joystick-base {
@@ -154,7 +154,7 @@ html, body, #app {
   opacity: 0.8;
 }
 
-/* Right Aim Surface Zone - z-index 20 so HUD and buttons sit safely on top */
+/* Right Aim Surface Zone - z-index 22 sits in touch-surfaces-layer behind HUD */
 #aim-zone {
   position: absolute;
   top: 0;
@@ -163,15 +163,36 @@ html, body, #app {
   height: 100vh;
   pointer-events: auto;
   touch-action: none;
-  z-index: 20;
+  z-index: 22;
 }
 
-/* Action Button Container - Highest z-index for instant tap responsiveness */
+/* ================= 2. HUD OVERLAY (z-index 50: 非操作部は透過、武器スロットのみ操作可) ================= */
+#hud {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 50 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+/* ================= 3. TOUCH CONTROLS LAYER (HUD最前面: アクションボタン & メニュー) ================= */
+#touch-controls-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Action Button Container - Front layer for instant responsive tapping */
 .touch-action-group {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 70;
+  z-index: 82;
 }
 
 /* General Touch Button (Futuristic Ghost Glass Design) */
@@ -359,17 +380,17 @@ html, body, #app {
 /* Top System Buttons (Pause & Fullscreen) */
 .mobile-top-actions {
   position: absolute;
-  top: calc(8px + var(--safe-top));
-  left: calc(10px + var(--safe-left));
+  top: calc(6px + var(--safe-top));
+  left: calc(8px + var(--safe-left));
   display: flex;
-  gap: 8px;
-  z-index: 80;
+  gap: 6px;
+  z-index: 95;
   pointer-events: auto !important;
 }
 
 .mobile-sys-btn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   background: rgba(8, 14, 28, 0.85);
   border: 1.5px solid rgba(0, 243, 255, 0.45);
@@ -377,7 +398,7 @@ html, body, #app {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
@@ -392,18 +413,18 @@ html, body, #app {
 
 /* ================= FULL PC HUD - MOBILE SLIM & ERGONOMIC LAYOUT ================= */
 
-/* 1. HUD TOP (ウェーブ・スコア・連続キル・目標・EX高度) - 上部中央にスリム配置 */
+/* 1. HUD TOP (ウェーブから敵性勢力ステータス: 全画面ボタンのすぐ右から配置) */
 #hud-top {
   position: absolute !important;
   top: calc(6px + var(--safe-top)) !important;
-  left: 50% !important;
-  transform: translateX(-50%) scale(0.85) !important;
-  transform-origin: top center !important;
+  left: calc(88px + var(--safe-left)) !important;
+  transform: scale(0.82) !important;
+  transform-origin: top left !important;
   display: flex !important;
   flex-direction: row !important;
-  gap: 8px !important;
+  gap: 6px !important;
   align-items: center !important;
-  z-index: 50 !important;
+  z-index: 52 !important;
   pointer-events: none !important;
   width: auto !important;
 }
@@ -415,13 +436,15 @@ html, body, #app {
 
 #hud-top .hud-panel {
   padding: 3px 8px !important;
-  background: rgba(8, 14, 28, 0.7) !important;
+  background: rgba(8, 14, 28, 0.75) !important;
   border-radius: 6px !important;
   border: 1px solid rgba(0, 243, 255, 0.25) !important;
+  white-space: nowrap !important;
 }
 
 #hud-top .hud-label {
   font-size: 8px !important;
+  white-space: nowrap !important;
 }
 
 #hud-top .hud-value-large {
@@ -438,10 +461,12 @@ html, body, #app {
   display: block !important;
   font-size: 9px !important;
   color: var(--neon-amber) !important;
+  white-space: nowrap !important;
 }
 
 .hud-enemies-status {
   font-size: 10px !important;
+  white-space: nowrap !important;
 }
 
 .progress-bar-bg {
@@ -449,98 +474,134 @@ html, body, #app {
   height: 4px !important;
 }
 
-/* 2. HUD TOP RIGHT (兵装強化ステータスバッジ ＆ レーダーミニマップ) */
+/* 2. HUD TOP RIGHT (索敵レーダーは右上、強化ステータス表示はその左に配置) */
 #hud-top-right {
   position: absolute !important;
   top: calc(6px + var(--safe-top)) !important;
   right: calc(10px + var(--safe-right)) !important;
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-end !important;
-  gap: 4px !important;
-  z-index: 50 !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 6px !important;
+  z-index: 52 !important;
   pointer-events: none !important;
 }
 
 #minimap-container {
-  width: 82px !important;
-  height: 82px !important;
+  width: 78px !important;
+  height: 78px !important;
   background: rgba(8, 14, 28, 0.75) !important;
+  flex-shrink: 0 !important;
 }
 
 #minimap-canvas {
-  width: 82px !important;
-  height: 82px !important;
+  width: 78px !important;
+  height: 78px !important;
 }
 
 #minimap-container .minimap-header {
-  font-size: 7.5px !important;
+  font-size: 7px !important;
   padding: 1px 3px !important;
 }
 
-/* 兵装強化ステータスバッジ: 縦長ボックスを廃止し、ミニマップ下に極小ピル型で横並び！ */
+/* 兵装強化ステータスバッジ: レーダーのすぐ左にコンパクト配置 (2列グリッド) */
 #hud-upgrades-bar {
   display: flex !important;
   flex-direction: column !important;
-  gap: 1px !important;
-  padding: 2px 4px !important;
-  background: rgba(6, 12, 24, 0.5) !important;
-  border: 1px solid rgba(0, 243, 255, 0.2) !important;
-  border-radius: 4px !important;
-  max-width: 140px !important;
+  gap: 2px !important;
+  padding: 3px 6px !important;
+  background: rgba(6, 12, 24, 0.7) !important;
+  border: 1px solid rgba(0, 243, 255, 0.25) !important;
+  border-radius: 5px !important;
+  max-width: 170px !important;
 }
 
 #hud-upgrades-bar .hud-label {
-  display: none !important; /* ラベルを非表示にして省スペース化 */
-}
-
-.upgrade-badges-row {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: flex-end !important;
-  gap: 2px !important;
-}
-
-.upgrade-badge {
+  display: block !important;
   font-size: 7.5px !important;
-  padding: 1px 3px !important;
-  border-radius: 3px !important;
-  line-height: 1.1 !important;
+  color: var(--neon-cyan) !important;
+  margin-bottom: 2px !important;
   white-space: nowrap !important;
 }
 
-/* 3. HUD BOTTOM LEFT (サイバーシールド・HP・スタミナ・バレットタイム) - 左下隅に極小スリム化 */
+.upgrade-badges-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 2px 4px !important;
+  width: 100% !important;
+}
+
+.upgrade-badge, .status-badge {
+  font-size: 7.5px !important;
+  padding: 1.5px 4px !important;
+  border-radius: 3px !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+
+/* 3. HUD BOTTOM LEFT (サイバーシールド・HP・スタミナ・バレットタイム: 極小超スリム化＆タップ透過) */
 #hud-bottom-left {
   position: absolute !important;
-  bottom: calc(8px + var(--safe-bottom)) !important;
-  left: calc(10px + var(--safe-left)) !important;
-  max-width: 135px !important;
-  z-index: 50 !important;
-  pointer-events: auto !important;
-  transform: scale(0.85) !important;
+  bottom: calc(6px + var(--safe-bottom)) !important;
+  left: calc(8px + var(--safe-left)) !important;
+  width: 105px !important;
+  max-width: 105px !important;
+  z-index: 45 !important;
+  pointer-events: none !important; /* ジョイスティック操作を一切阻害しない */
+  transform: scale(0.78) !important;
   transform-origin: bottom left !important;
 }
 
-.vitals-panel {
-  padding: 4px 6px !important;
-  background: rgba(8, 14, 28, 0.7) !important;
-  border-radius: 6px !important;
+#hud-bottom-left .vitals-panel {
+  padding: 3px 5px !important;
+  background: rgba(6, 12, 24, 0.65) !important;
+  border-radius: 5px !important;
   border: 1px solid rgba(0, 243, 255, 0.2) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
 }
 
-.vital-name {
-  font-size: 8px !important;
+#hud-bottom-left .vital-row {
+  margin-bottom: 1px !important;
 }
 
-.vital-num {
-  font-size: 8px !important;
+#hud-bottom-left .vital-meta {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 7px !important;
+  line-height: 1 !important;
+  margin-bottom: 1px !important;
 }
 
-.bar-track {
-  height: 4px !important;
+#hud-bottom-left .vital-icon {
+  font-size: 7px !important;
+  margin-right: 2px !important;
 }
 
-/* 4. HUD BOTTOM RIGHT (武器スロット ＆ 弾薬パネル) - 画面最下部中央に配置し、右下ボタンとの干渉を完全解消 */
+#hud-bottom-left .vital-name {
+  font-size: 6.5px !important;
+  letter-spacing: 0px !important;
+}
+
+#hud-bottom-left .vital-num {
+  font-size: 6.5px !important;
+  font-family: var(--font-mono) !important;
+}
+
+#hud-bottom-left .bar-track {
+  height: 3px !important;
+  border-radius: 1.5px !important;
+}
+
+#hud-bottom-left .bar-track.tiny {
+  height: 2px !important;
+}
+
+/* 4. HUD BOTTOM RIGHT (武器スロット ＆ 弾薬パネル) - 画面最下部中央に配置し、確実なタップ・切替を保証 */
 #hud-bottom-right {
   position: absolute !important;
   bottom: calc(6px + var(--safe-bottom)) !important;
@@ -551,7 +612,7 @@ html, body, #app {
   flex-direction: row !important;
   align-items: flex-end !important;
   gap: 6px !important;
-  z-index: 75 !important; /* Higher than aim-zone so weapon switching ALWAYS works */
+  z-index: 65 !important;
   pointer-events: auto !important;
 }
 
@@ -565,6 +626,7 @@ html, body, #app {
 .weapon-slots-row {
   display: flex !important;
   gap: 2px !important;
+  pointer-events: auto !important;
 }
 
 .weapon-slot {
@@ -572,23 +634,26 @@ html, body, #app {
   cursor: pointer !important;
   padding: 3px 6px !important;
   font-size: 9.5px !important;
-  background: rgba(8, 14, 28, 0.85) !important;
-  border: 1px solid rgba(0, 243, 255, 0.4) !important;
+  background: rgba(8, 14, 28, 0.88) !important;
+  border: 1.5px solid rgba(0, 243, 255, 0.45) !important;
   border-radius: 4px !important;
   white-space: nowrap !important;
   touch-action: manipulation !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 .weapon-slot:active {
-  background: rgba(0, 243, 255, 0.35) !important;
+  background: rgba(0, 243, 255, 0.4) !important;
   border-color: var(--neon-cyan) !important;
-  transform: scale(0.95) !important;
+  transform: scale(0.93) !important;
 }
 
 .weapon-slot.active {
   border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 8px rgba(0, 243, 255, 0.5) !important;
-  background: rgba(0, 243, 255, 0.18) !important;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.6) !important;
+  background: rgba(0, 243, 255, 0.22) !important;
 }
 
 .ammo-panel {
@@ -623,10 +688,90 @@ html, body, #app {
   transform: scale(0.9) !important;
 }
 
-/* Crosshair */
+/* ================= 照準レティクル (全画面/PWA 完全真円中心同期) ================= */
+#crosshair-wrapper {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 45 !important;
+}
+
 #crosshair {
-  width: 22px !important;
-  height: 22px !important;
+  position: relative !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#crosshair .ch-part {
+  position: absolute !important;
+  background: var(--neon-cyan) !important;
+  box-shadow: 0 0 4px var(--neon-cyan-glow) !important;
+}
+
+#crosshair .ch-top {
+  width: 2px !important;
+  height: 6px !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: auto !important;
+  right: auto !important;
+}
+
+#crosshair .ch-bottom {
+  width: 2px !important;
+  height: 6px !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  top: auto !important;
+  right: auto !important;
+}
+
+#crosshair .ch-left {
+  width: 6px !important;
+  height: 2px !important;
+  left: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+
+#crosshair .ch-right {
+  width: 6px !important;
+  height: 2px !important;
+  right: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: auto !important;
+  bottom: auto !important;
+}
+
+#crosshair .ch-dot {
+  position: absolute !important;
+  width: 4px !important;
+  height: 4px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  box-shadow: 0 0 5px #ffffff !important;
+}
+
+#hitmarker {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
 }
 
 /* Mobile Start Modal Adjustments */

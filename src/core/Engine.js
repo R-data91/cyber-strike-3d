@@ -53,8 +53,16 @@ export class Engine {
     // Setup Natural Daytime Lighting
     this.setupLighting();
 
-    // Resize Handler
-    window.addEventListener('resize', () => this.onResize());
+    // Resize Handler with mobile fullscreen and orientation transition support
+    const handleResize = () => {
+      this.onResize();
+      setTimeout(() => this.onResize(), 100);
+      setTimeout(() => this.onResize(), 300);
+    };
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('fullscreenchange', handleResize);
+    document.addEventListener('webkitfullscreenchange', handleResize);
+    window.addEventListener('orientationchange', handleResize);
   }
 
   setQuality(qualityMode) {
