@@ -339,10 +339,10 @@ export class Player {
     this.activeWeapon = this.weapons[index];
     this.activeWeapon.setActive(true);
 
-    const curAmmo = this.activeWeapon.currentAmmo;
+    const ammoCount = Math.max(this.activeWeapon.currentAmmo, this.activeWeapon.reserveAmmo);
     let wieldMode = 1;
-    if (curAmmo >= 6000) wieldMode = 3;
-    else if (curAmmo >= 3000) wieldMode = 2;
+    if (ammoCount >= 6000) wieldMode = 3;
+    else if (ammoCount >= 3000) wieldMode = 2;
     if (this.activeWeapon.setWieldMode) {
       this.activeWeapon.setWieldMode(wieldMode);
     } else {
@@ -644,10 +644,10 @@ export class Player {
     this.camera.position.set(this.position.x, this.position.y + this.currentHeight, this.position.z);
 
     // 8. Update Active Weapon & Multi-Wield State (2丁流・3丁流の実モデル同期)
-    const curAmmo = this.activeWeapon.currentAmmo;
+    const ammoCount = Math.max(this.activeWeapon.currentAmmo, this.activeWeapon.reserveAmmo);
     let wieldMode = 1;
-    if (curAmmo >= 6000) wieldMode = 3;
-    else if (curAmmo >= 3000) wieldMode = 2;
+    if (ammoCount >= 6000) wieldMode = 3;
+    else if (ammoCount >= 3000) wieldMode = 2;
     if (this.activeWeapon.setWieldMode) {
       this.activeWeapon.setWieldMode(wieldMode);
     } else {
@@ -803,10 +803,10 @@ export class Player {
     });
 
     // 2丁モード (3000弾以上) / 3丁モード (6000弾以上) を兵装に設定
-    const curAmmo = this.activeWeapon.currentAmmo;
+    const ammoCount = Math.max(this.activeWeapon.currentAmmo, this.activeWeapon.reserveAmmo);
     let wieldMode = 1;
-    if (curAmmo >= 6000) wieldMode = 3;
-    else if (curAmmo >= 3000) wieldMode = 2;
+    if (ammoCount >= 6000) wieldMode = 3;
+    else if (ammoCount >= 3000) wieldMode = 2;
     this.activeWeapon.wieldMode = wieldMode;
 
     const obstacleMeshes = this.level.colliderMeshes || this.level.colliders;
@@ -816,7 +816,7 @@ export class Player {
     }
 
     if (Array.isArray(hit)) {
-      // 散弾銃: 複数ペレット命中時は個別の音を抑止し、まとめて単一の重低音ヒット音を鳴動 (クリッピング解消)
+      // 散弾銃・2丁/3丁流: 複数弾命中時は個別の音を抑止し、まとめて単一のヒット音を鳴動
       let hasHit = false;
       let hasCritical = false;
       hit.forEach(h => {
@@ -870,12 +870,19 @@ export class Player {
     if (this.weapons[5]) this.weapons[5].reserveAmmo = Math.min(maxReserve, this.weapons[5].reserveAmmo + beam);
   }
 
-  // アドレナリン蓄積
+  // アドレナリン蓄積 ＆ 自動発動
   addAdrenaline(amount) {
     this.adrenaline = Math.min(this.maxAdrenaline, this.adrenaline + amount);
+    // 全体機能変更: アドレナリン発動は自動化 (100%蓄積時に自動でバレットタイムを発動)
+    if (this.adrenaline >= 100 && !this.isBulletTime) {
+      const activated = this.activateBulletTime();
+      if (activated && this.onBulletTimeAutoTriggered) {
+        this.onBulletTimeAutoTriggered();
+      }
+    }
   }
 
-  // アドレナリン・バレットタイム発動 (Qキー)
+  // アドレナリン・バレットタイム発動 (Qキーまたは自動発動)
   activateBulletTime() {
     if (this.adrenaline < 50 || this.isBulletTime) return false;
     this.adrenaline = Math.max(0, this.adrenaline - 50);

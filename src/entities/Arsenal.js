@@ -703,14 +703,24 @@ export class VortexRailgun extends Weapon {
       }
     }
 
+    const wield = this.wieldMode || 1;
     const endPoint = closestHit ? closestHit.hit.point : muzzleWorld.clone().addScaledVector(rayDir, this.range * 1.5);
     this.particles.createRailgunBeam(muzzleWorld, endPoint);
 
+    if (wield >= 2) {
+      const leftMuzzle = muzzleWorld.clone().add(new THREE.Vector3(-0.18, 0, 0));
+      this.particles.createRailgunBeam(leftMuzzle, endPoint);
+    }
+    if (wield >= 3) {
+      const rightMuzzle = muzzleWorld.clone().add(new THREE.Vector3(0.18, 0.05, 0));
+      this.particles.createRailgunBeam(rightMuzzle, endPoint);
+    }
+
     if (closestHit) {
       if (closestHit.type === 'wall') {
-        this.particles.createImpactSparks(closestHit.hit.point, getSafeNormal(closestHit.hit), 0x00f3ff, 18);
+        this.particles.createImpactSparks(closestHit.hit.point, getSafeNormal(closestHit.hit), 0x00f3ff, 18 * wield);
       }
-      return closestHit;
+      return wield > 1 ? Array(wield).fill(closestHit) : closestHit;
     }
     return null;
   }
@@ -973,11 +983,21 @@ export class HeavyGrenadeLauncher extends Weapon {
       hitDistance = hits[0].distance;
     }
 
+    const wield = this.wieldMode || 1;
     const blastPoint = closestHit ? closestHit.hit.point : muzzleWorld.clone().addScaledVector(rayDir, this.range);
     this.particles.createTracer(muzzleWorld, blastPoint, 0xff7700);
 
+    if (wield >= 2) {
+      const leftMuzzle = muzzleWorld.clone().add(new THREE.Vector3(-0.20, 0, 0));
+      this.particles.createTracer(leftMuzzle, blastPoint, 0xff7700);
+    }
+    if (wield >= 3) {
+      const rightMuzzle = muzzleWorld.clone().add(new THREE.Vector3(0.20, 0.05, 0));
+      this.particles.createTracer(rightMuzzle, blastPoint, 0xff7700);
+    }
+
     // 着弾特大爆風エフェクト & 爆破音
-    this.particles.createBlastExplosion(blastPoint, 0xff5500, 1.4);
+    this.particles.createBlastExplosion(blastPoint, 0xff5500, 1.4 * (wield > 1 ? 1.25 : 1.0));
     const blastDist = blastPoint.distanceTo(this.camera.position);
     this.audio.playExplosion(blastDist);
 
@@ -1012,9 +1032,9 @@ export class HeavyGrenadeLauncher extends Weapon {
     }
 
     if (affectedHits.length > 0) {
-      return affectedHits;
+      return wield > 1 ? Array.from({ length: wield }, () => affectedHits).flat() : affectedHits;
     }
-    return closestHit;
+    return closestHit ? (wield > 1 ? Array(wield).fill(closestHit) : closestHit) : null;
   }
 }
 
@@ -1216,16 +1236,25 @@ export class NebulaBeamCannon extends Weapon {
     else if (this.currentTier === 2) rampMult = 1.6;
     else rampMult = 1.0;
 
+    const wield = this.wieldMode || 1;
     penetratingHits.forEach(h => {
-      h.hit.rampMult = rampMult;
+      h.hit.rampMult = rampMult * wield;
     });
 
-    // 5段階のビーム視覚演出を描画
+    // 5段階のビーム視覚演出を描画 (2丁・3丁流時は全マズルから並列照射)
     this.particles.createNebulaBeam(muzzleWorld, endPoint, this.currentTier, 0.09);
+    if (wield >= 2) {
+      const leftMuzzle = muzzleWorld.clone().add(new THREE.Vector3(-0.22, 0, 0));
+      this.particles.createNebulaBeam(leftMuzzle, endPoint, this.currentTier, 0.09);
+    }
+    if (wield >= 3) {
+      const centerMuzzle = muzzleWorld.clone().add(new THREE.Vector3(0.22, 0.06, 0));
+      this.particles.createNebulaBeam(centerMuzzle, endPoint, this.currentTier, 0.09);
+    }
 
     if (wallHits.length > 0) {
       const sparkColor = this.currentTier >= 3 ? 0x00f3ff : 0xd946ef;
-      this.particles.createImpactSparks(wallHits[0].point, getSafeNormal(wallHits[0]), sparkColor, 10 + this.currentTier * 4);
+      this.particles.createImpactSparks(wallHits[0].point, getSafeNormal(wallHits[0]), sparkColor, (10 + this.currentTier * 4) * wield);
     }
 
     if (penetratingHits.length > 0) {

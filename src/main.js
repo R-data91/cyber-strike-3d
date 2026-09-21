@@ -392,6 +392,12 @@ export class CyberStrikeGame {
   }
 
   setupPlayerCallbacks() {
+    this.player.onBulletTimeAutoTriggered = () => {
+      if (this.hud && this.state === 'PLAYING') {
+        this.hud.showAnnouncement('⚡ BULLET TIME ACTIVATED ⚡', 'special');
+      }
+    };
+
     this.player.onWeaponFired = () => {
       this.shotsFired++;
     };

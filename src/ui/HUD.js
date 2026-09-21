@@ -360,10 +360,11 @@ export class HUD {
     if (!this.ammoCtx) return;
     const currentAmmo = weapon.currentAmmo;
     const magSize = weapon.magazineSize;
-    let wieldMode = 1;
-    if (currentAmmo >= 6000) {
+    const ammoCount = Math.max(weapon.currentAmmo, weapon.reserveAmmo || 0);
+    let wieldMode = weapon.wieldMode || 1;
+    if (ammoCount >= 6000) {
       wieldMode = 3;
-    } else if (currentAmmo >= 3000) {
+    } else if (ammoCount >= 3000) {
       wieldMode = 2;
     }
 
@@ -488,10 +489,8 @@ export class HUD {
       setWidth(this.adrenalineBar, `${adrPct}%`);
       if (player.isBulletTime) {
         setText(this.adrenalineText, `減速中 (${player.bulletTimeTimer.toFixed(1)}s)`);
-      } else if (adrPct >= 50) {
-        setText(this.adrenalineText, `発動可能 [Q] (${Math.round(adrPct)}%)`);
       } else {
-        setText(this.adrenalineText, `${Math.round(adrPct)}%`);
+        setText(this.adrenalineText, `${Math.round(adrPct)}% [AUTO]`);
       }
     }
 

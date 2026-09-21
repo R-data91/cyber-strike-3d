@@ -168,7 +168,6 @@
       <!-- 右上エリア: 強化ステータスをマップすぐ左に配置 ＆ レーダーミニマップ -->
       <div id="hud-top-right">
         <div id="hud-upgrades-bar" class="hud-panel hud-upgrades">
-          <span class="hud-label">兵装強化ステータス</span>
           <div class="upgrade-badges-row">
             <span id="badge-dmg-up" class="upgrade-badge dmg">威力: x1.0</span>
             <span id="badge-mag-up" class="upgrade-badge mag">弾倉: 標準</span>
@@ -238,15 +237,15 @@
         </div>
       </footer>
 
-      <!-- 無敵バリア持続インジケーター (武器エリアの上部にフロート配置) -->
-      <div id="invincible-indicator" class="invincible-indicator hidden">
-        <span class="inv-icon">🛡️</span>
-        <span class="inv-title">無敵バリア:</span>
-        <span id="invincible-timer-val" class="inv-timer">5.0s</span>
-      </div>
-
       <!-- 右下: 武器 & 弾薬ステータス (全6種兵装スロット ＆ 弾薬パネル) -->
       <footer id="hud-bottom-right">
+        <!-- 無敵バリア持続インジケーター (武器エリアの直上・右端揃え配置) -->
+        <div id="invincible-indicator" class="invincible-indicator hidden">
+          <span class="inv-icon">🛡️</span>
+          <span class="inv-title">無敵バリア:</span>
+          <span id="invincible-timer-val" class="inv-timer">5.0s</span>
+        </div>
+
         <!-- 武器スロット選択 (1~3と4~6+手榴弾の2行構成) -->
         <div class="weapon-slots-container">
           <div class="weapon-slots-row">
@@ -370,89 +369,77 @@
         <h1 class="game-title">CYBER<span>STRIKE</span> 3D</h1>
         <p class="game-subtitle">スマートフォン・タブレット最適化 // バーチャルスティック ＆ スワイプエイム ＆ ジャイロ照準</p>
 
-        <div class="menu-briefing wide-dashboard">
-          <!-- カラム1: タッチ操作ガイド -->
-          <div class="briefing-box">
-            <h3>📱 タッチ操作ガイド</h3>
-            <p class="briefing-desc">
-              左画面ドラッグで移動、右画面スワイプで視点旋回！各種ボタンで射撃・照準・ジャンプ・スライドを発動。
-            </p>
-            <div class="update-highlights">
-              <div class="update-item">🕹️ <b>左手スティック</b>: ドラッグで移動。大きく倒すと高速ダッシュ！</div>
-              <div class="update-item">👁️ <b>右手スワイプ</b>: 画面右側の空き領域をスワイプしてカメラエイム</div>
-              <div class="update-item">🔥 <b>射撃ボタン</b>: 右下大型ボタン。長押しでフルオート、ドラッグで微調整エイムも可能</div>
-              <div class="update-item">🎯 <b>ADSボタン</b>: タップで精密照準モード・スコープ展開</div>
-              <div class="update-item">📱 <b>ジャイロ照準</b>: 端末を上下左右に傾けて精密エイム（設定で切替可能）</div>
+        <div class="menu-briefing start-dashboard-grid">
+          <!-- 左カラム: 操作ガイド ＆ コアアイテム -->
+          <div class="start-col-left">
+            <div class="briefing-box compact-box">
+              <h3 class="box-title">📱 タッチ操作ガイド</h3>
+              <div class="update-highlights">
+                <div class="update-item">🕹️ <b>左スティック</b>: 移動 (大きく倒してダッシュ)</div>
+                <div class="update-item">👁️ <b>右画面スワイプ</b>: 視点旋回・カメラエイム</div>
+                <div class="update-item">🔥 <b>FIREボタン</b>: 射撃 (長押しフルオート/微調整)</div>
+                <div class="update-item">🎯 <b>ADSボタン</b>: 精密照準・スコープ</div>
+              </div>
+            </div>
+
+            <div class="cores-guide-box compact-box">
+              <h3 class="box-title">兵装 ＆ 戦術アイテム</h3>
+              <div class="cores-list-grid">
+                <div class="core-chip dmg"><span class="core-icon">🟣</span><span class="core-info"><b>威力</b>: +10%</span></div>
+                <div class="core-chip mag"><span class="core-icon">🟡</span><span class="core-info"><b>弾倉</b>: 2/3丁流</span></div>
+                <div class="core-chip speed"><span class="core-icon">🟢</span><span class="core-info"><b>機動</b>: 速度UP</span></div>
+                <div class="core-chip inv"><span class="core-icon">🛡️</span><span class="core-info"><b>無敵</b>: 5秒防御</span></div>
+              </div>
             </div>
           </div>
 
-          <!-- カラム2: 兵装・アイテム -->
-          <div class="cores-guide-box">
-            <h3>兵装 ＆ 戦術アイテム</h3>
-            <div class="cores-list">
-              <div class="core-card dmg">
-                <span class="core-icon">🟣</span>
-                <div class="core-info"><b>威力増幅コア</b>: 全武器威力 +10%</div>
+          <!-- 右カラム: 環境設定パネル (縦並びでゆったりと配置・スライダー重複解消) -->
+          <div class="start-col-right start-settings-panel">
+            <h3 class="box-title">⚙️ 作戦環境設定</h3>
+            <div class="setting-item">
+              <label for="select-quality">グラフィック画質:</label>
+              <select id="select-quality" class="cyber-select">
+                <option value="low" selected>低 (スマホ推奨 超軽量)</option>
+                <option value="medium">中 (標準バランス)</option>
+                <option value="high">高 (高画質・タブレット向)</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label for="input-sens">タッチ視点感度: <span id="sens-val-display" class="sens-chip">1.00</span></label>
+              <input type="range" id="input-sens" min="0.2" max="3.0" step="0.1" value="1.00">
+            </div>
+            <div class="setting-item">
+              <div class="toggle-switch-wrapper">
+                <label for="toggle-gyro">ジャイロ照準 (傾きエイム):</label>
+                <input type="checkbox" id="toggle-gyro" class="toggle-checkbox">
               </div>
-              <div class="core-card mag">
-                <span class="core-icon">🟡</span>
-                <div class="core-info"><b>拡張弾倉コア</b>: 装弾数拡張 (2丁・3丁流へ)</div>
+            </div>
+            <div class="settings-vol-row">
+              <div class="setting-item vol-item">
+                <label for="input-sfx-vol">効果音: <span id="sfx-vol-val-display">80%</span></label>
+                <input type="range" id="input-sfx-vol" min="0" max="100" step="5" value="80">
               </div>
-              <div class="core-card speed">
-                <span class="core-icon">🟢</span>
-                <div class="core-info"><b>機動ブースター</b>: 移動速度向上</div>
-              </div>
-              <div class="core-card inv">
-                <span class="core-icon">🛡️</span>
-                <div class="core-info"><b>無敵バリアコア</b>: 5秒間完全無効化</div>
+              <div class="setting-item vol-item">
+                <label for="input-bgm-vol">BGM: <span id="bgm-vol-val-display">10%</span></label>
+                <input type="range" id="input-bgm-vol" min="0" max="100" step="5" value="10">
               </div>
             </div>
           </div>
         </div>
 
-        <!-- モバイル設定バー -->
-        <div class="start-settings-bar">
-          <div class="setting-item">
-            <label for="select-quality">グラフィック画質:</label>
-            <select id="select-quality" class="cyber-select">
-              <option value="low" selected>低 (スマホ推奨 超軽量)</option>
-              <option value="medium">中 (標準バランス)</option>
-              <option value="high">高 (高画質・タブレット向)</option>
-            </select>
-          </div>
-          <div class="setting-item">
-            <label for="input-sens">タッチ視点感度: <span id="sens-val-display">1.00</span></label>
-            <input type="range" id="input-sens" min="0.2" max="3.0" step="0.1" value="1.00">
-          </div>
-          <div class="setting-item">
-            <div class="toggle-switch-wrapper">
-              <label for="toggle-gyro">ジャイロ照準 (傾きエイム):</label>
-              <input type="checkbox" id="toggle-gyro" class="toggle-checkbox">
-            </div>
-          </div>
-          <div class="setting-item">
-            <label for="input-sfx-vol">効果音(銃声): <span id="sfx-vol-val-display">80%</span></label>
-            <input type="range" id="input-sfx-vol" min="0" max="100" step="5" value="80">
-          </div>
-          <div class="setting-item">
-            <label for="input-bgm-vol">BGM音量: <span id="bgm-vol-val-display">10%</span></label>
-            <input type="range" id="input-bgm-vol" min="0" max="100" step="5" value="10">
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap;">
-          <button id="btn-start-game" class="btn-cyber-primary" style="padding: 14px 28px; font-size: 16px;">
+        <div class="start-actions-row">
+          <button id="btn-start-game" class="btn-cyber-primary start-main-btn">
             <span class="btn-glitch"></span>
-            <span class="btn-text">作戦開始 [タップして出撃]</span>
+            <span class="btn-text">作戦開始 [出撃]</span>
           </button>
-          <button id="btn-start-custom-hud" class="btn-cyber-secondary" style="border-color: #00f3ff; color: #00f3ff; font-weight: 800; padding: 12px 20px;">
-            🎮 ボタン配置・サイズ設定
+          <button id="btn-start-custom-hud" class="btn-cyber-secondary start-sub-btn">
+            🎮 ボタン設定
           </button>
-          <button id="btn-start-ex" class="btn-cyber-secondary" style="border-color: #ffd700; color: #ffd700; box-shadow: 0 0 16px rgba(255, 215, 0, 0.45); font-weight: 800; padding: 12px 20px;">
-            🚀 EXステージ直行 [STAGE 100体験]
+          <button id="btn-start-ex" class="btn-cyber-secondary start-sub-btn ex-btn">
+            🚀 EXステージ
           </button>
-          <a href="../" class="btn-cyber-secondary" style="color: #8b9bb4; text-decoration: none; padding: 10px 16px; font-size: 13px; display: inline-flex; align-items: center;">
-            💻 PC版へ戻る
+          <a href="../" class="btn-cyber-secondary start-sub-btn pc-btn">
+            💻 PC版
           </a>
         </div>
 
