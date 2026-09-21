@@ -77,35 +77,35 @@
         <div class="perf-item"><span class="perf-lbl">HEAP:</span> <span id="perf-heap" class="perf-val">42MB</span></div>
       </div>
 
-      <!-- トップバー: ウェーブ & スコア & 目標ステータス -->
+      <!-- トップバー: ウェーブからスコアまで左上に配置 (2段構成で中央ボスHUDとの重複解消) -->
       <header id="hud-top">
         <div class="hud-top-row">
           <div class="hud-panel hud-wave">
-            <span class="hud-label">WAVE</span>
+            <span class="hud-label">防衛ウェーブ</span>
             <div class="hud-value-large" id="hud-wave-val">1</div>
           </div>
 
           <div class="hud-panel hud-score">
-            <span class="hud-label">SCORE</span>
+            <span class="hud-label">戦闘スコア</span>
             <div class="hud-value-medium" id="hud-score-val">0</div>
-            <div class="hud-sub" id="hud-streak-val" style="display:none;">連続キル: 0x</div>
+            <div class="hud-sub" id="hud-streak-val">連続キル: 0x</div>
           </div>
         </div>
 
         <div class="hud-panel hud-objective">
-          <span class="hud-label">ENEMY STATUS</span>
+          <span class="hud-label">敵性勢力ステータス</span>
           <div class="hud-enemies-status">
-            残存: <span id="hud-enemies-left">0</span> / <span id="hud-enemies-total">0</span>
+            敵兵残存: <span id="hud-enemies-left">0</span> / <span id="hud-enemies-total">0</span>
           </div>
-          <div class="progress-bar-bg" style="width: 100px;">
+          <div class="progress-bar-bg">
             <div id="wave-progress-fill" class="progress-bar-fill"></div>
           </div>
         </div>
 
         <!-- EXステージ専用: 昇降高度インジケーター -->
         <div id="hud-altitude-panel" class="hud-panel hud-altitude hidden">
-          <span class="hud-label" style="color: #ffd700;">軌道高度</span>
-          <div class="hud-enemies-status" style="color: #ffd700;" id="hud-altitude-val">ALT: 12,000m ↑</div>
+          <span class="hud-label" style="color: #ffd700;">軌道高度 (EX-ASCENSION)</span>
+          <div class="hud-enemies-status" style="color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);" id="hud-altitude-val">ALT: 12,000m ↑ 昇降中</div>
         </div>
       </header>
 
@@ -113,7 +113,7 @@
       <div id="boss-hud-container" class="boss-hud-container hidden">
         <div class="boss-hud-info">
           <span class="boss-badge">⚠️ RAID BOSS</span>
-          <span id="boss-name" class="boss-name">TITAN-V1</span>
+          <span id="boss-name" class="boss-name">機動要塞 TITAN-V1</span>
           <span id="boss-hp-text" class="boss-hp-text">1600 / 1600</span>
         </div>
         <div class="boss-hp-track">
@@ -126,7 +126,7 @@
         <div id="announcement-banner" class="hidden"></div>
         <div id="invincible-indicator" class="invincible-indicator hidden">
           <span class="inv-icon">🛡️</span>
-          <span class="inv-title">無敵バリア:</span>
+          <span class="inv-title">無敵バリア展開中:</span>
           <span id="invincible-timer-val" class="inv-timer">5.0s</span>
         </div>
       </div>
@@ -146,28 +146,30 @@
           <div class="hm-line hm-tr"></div>
           <div class="hm-line hm-bl"></div>
           <div class="hm-line hm-br"></div>
-          <div id="headshot-indicator" class="hidden">HEADSHOT</div>
+          <div id="headshot-indicator" class="hidden">急所命中 (HEADSHOT)</div>
         </div>
         <div id="interaction-prompt" class="hidden"></div>
       </div>
 
-      <!-- 右上エリア: レーダーミニマップ -->
+      <!-- 右上エリア: 強化ステータスをマップすぐ左に配置 ＆ レーダーミニマップ -->
       <div id="hud-top-right">
+        <div id="hud-upgrades-bar" class="hud-panel hud-upgrades">
+          <span class="hud-label">兵装強化ステータス</span>
+          <div class="upgrade-badges-row">
+            <span id="badge-dmg-up" class="upgrade-badge dmg">威力: x1.0</span>
+            <span id="badge-mag-up" class="upgrade-badge mag">弾倉: 標準</span>
+            <span id="badge-rate-up" class="upgrade-badge rate">連射: x1.0</span>
+            <span id="badge-range-up" class="upgrade-badge range">範囲: 標準</span>
+            <span id="badge-speed-up" class="upgrade-badge speed">機動: x1.0</span>
+            <span id="badge-drop-up" class="upgrade-badge drop">泥率: 80%</span>
+            <span id="badge-double-drop" class="upgrade-badge double-drop">倍泥: なし</span>
+          </div>
+        </div>
+
         <div id="minimap-container">
-          <div class="minimap-header">RADAR // 50M</div>
+          <div class="minimap-header">索敵レーダー // 50M</div>
           <canvas id="minimap-canvas" width="160" height="160"></canvas>
         </div>
-      </div>
-
-      <!-- 兵装強化ステータス (非表示DOM・HUD互換用) -->
-      <div id="hud-upgrades-bar" class="hidden">
-        <span id="badge-dmg-up"></span>
-        <span id="badge-mag-up"></span>
-        <span id="badge-rate-up"></span>
-        <span id="badge-range-up"></span>
-        <span id="badge-speed-up"></span>
-        <span id="badge-drop-up"></span>
-        <span id="badge-double-drop"></span>
       </div>
 
       <!-- 左下: プレイヤーバイタル (シールド, HP, スタミナ, バレットタイム) -->
@@ -177,7 +179,7 @@
           <div class="vital-row">
             <div class="vital-meta">
               <span class="vital-icon shield-icon">🛡️</span>
-              <span class="vital-name">SHIELD</span>
+              <span class="vital-name">サイバーシールド</span>
               <span class="vital-num" id="hud-shield-text">0 / 200</span>
             </div>
             <div class="bar-track">
@@ -185,11 +187,11 @@
             </div>
           </div>
 
-          <!-- HPバー -->
+          <!-- HP / 耐久値バー -->
           <div class="vital-row">
             <div class="vital-meta">
               <span class="vital-icon hp-icon">❤️</span>
-              <span class="vital-name">HEALTH</span>
+              <span class="vital-name">アーマー / HP</span>
               <span class="vital-num" id="hud-hp-text">100 / 100</span>
             </div>
             <div class="bar-track">
@@ -197,10 +199,10 @@
             </div>
           </div>
 
-          <!-- スタミナバー -->
+          <!-- ダッシュスタミナバー -->
           <div class="vital-row compact">
             <div class="vital-meta">
-              <span class="vital-name small">STAMINA</span>
+              <span class="vital-name small">ブースタースタミナ</span>
               <span class="vital-num small" id="hud-stamina-text">100%</span>
             </div>
             <div class="bar-track tiny">
@@ -208,11 +210,11 @@
             </div>
           </div>
 
-          <!-- バレットタイムバー -->
+          <!-- アドレナリン・バレットタイム -->
           <div class="vital-row compact adrenaline-row">
             <div class="vital-meta">
               <span class="vital-icon adrenaline-icon">⚡</span>
-              <span class="vital-name small">TIME</span>
+              <span class="vital-name small">バレットタイム [Q]</span>
               <span class="vital-num small" id="hud-adrenaline-text">0%</span>
             </div>
             <div class="bar-track tiny">
@@ -222,22 +224,65 @@
         </div>
       </footer>
 
-      <!-- PC用武器スロット (HUD互換のための非表示DOM) -->
-      <footer id="hud-bottom-right" class="hidden">
-        <div id="slot-1" data-slot="1"></div>
-        <div id="slot-2" data-slot="2"></div>
-        <div id="slot-3" data-slot="3"></div>
-        <div id="slot-4" data-slot="4"></div>
-        <div id="slot-5" data-slot="5"></div>
-        <div id="slot-6" data-slot="6"></div>
-        <div id="slot-grenade"></div>
-        <div id="hud-current-weapon-name"></div>
-        <div id="hud-fire-mode"></div>
-        <div id="hud-wield-mode"></div>
-        <div id="hud-ammo-current"></div>
-        <div id="hud-ammo-reserve"></div>
-        <div id="reload-indicator"></div>
-        <div id="ammo-bars-container"></div>
+      <!-- 右下: 武器 & 弾薬ステータス (全6種兵装スロット ＆ 弾薬パネル) -->
+      <footer id="hud-bottom-right">
+        <!-- 武器スロット選択 (1~3と4~6+手榴弾の2行構成) -->
+        <div class="weapon-slots-container">
+          <div class="weapon-slots-row">
+            <div class="weapon-slot active" id="slot-1" data-slot="1">
+              <span class="slot-num">1</span>
+              <span class="slot-name">AK-47</span>
+            </div>
+            <div class="weapon-slot" id="slot-2" data-slot="2">
+              <span class="slot-num">2</span>
+              <span class="slot-name">散弾銃</span>
+            </div>
+            <div class="weapon-slot" id="slot-3" data-slot="3">
+              <span class="slot-num">3</span>
+              <span class="slot-name">狙撃銃</span>
+            </div>
+          </div>
+          <div class="weapon-slots-row">
+            <div class="weapon-slot" id="slot-4" data-slot="4">
+              <span class="slot-num">4</span>
+              <span class="slot-name">高速SMG</span>
+            </div>
+            <div class="weapon-slot" id="slot-5" data-slot="5">
+              <span class="slot-num">5</span>
+              <span class="slot-name">榴弾砲</span>
+            </div>
+            <div class="weapon-slot" id="slot-6" data-slot="6">
+              <span class="slot-num">6</span>
+              <span class="slot-name">光線砲</span>
+            </div>
+            <div class="weapon-slot grenade-slot" id="slot-grenade">
+              <span class="slot-num">G</span>
+              <span class="slot-name">手榴弾 <b id="hud-grenade-count">x3</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 弾薬メインパネル -->
+        <div class="ammo-panel">
+          <div class="ammo-header">
+            <span id="hud-current-weapon-name">AK-47</span>
+            <span id="hud-fire-mode" class="tag">フルオート</span>
+            <span id="hud-wield-mode" class="tag wield-badge hidden">2丁流 ⚔️</span>
+          </div>
+
+          <div class="ammo-readout">
+            <span id="hud-ammo-current" class="ammo-current">30</span>
+            <span class="ammo-divider">/</span>
+            <span id="hud-ammo-reserve" class="ammo-reserve">180</span>
+          </div>
+
+          <div id="reload-indicator" class="hidden">
+            <div class="reload-spinner"></div>
+            <span>リロード中...</span>
+          </div>
+
+          <div id="ammo-bars-container" class="ammo-bullets-grid"></div>
+        </div>
       </footer>
     </div>
 

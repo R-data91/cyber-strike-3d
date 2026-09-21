@@ -91,12 +91,12 @@ html, body, #app {
 #touch-controls-layer {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: 40;
   pointer-events: none;
   overflow: hidden;
 }
 
-/* Left Joystick Zone */
+/* Left Joystick Zone (Full left half of the screen) */
 #joystick-zone {
   position: absolute;
   top: 0;
@@ -105,19 +105,19 @@ html, body, #app {
   height: 100vh;
   pointer-events: auto;
   touch-action: none;
-  z-index: 22;
+  z-index: 42;
 }
 
 #joystick-base {
   position: absolute;
-  width: 120px;
-  height: 120px;
-  margin-left: -60px;
-  margin-top: -60px;
+  width: 124px;
+  height: 124px;
+  margin-left: -62px;
+  margin-top: -62px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 243, 255, 0.08) 0%, rgba(0, 30, 60, 0.45) 80%);
-  border: 2px solid rgba(0, 243, 255, 0.45);
-  box-shadow: 0 0 20px rgba(0, 243, 255, 0.25), inset 0 0 15px rgba(0, 243, 255, 0.15);
+  background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, rgba(0, 30, 60, 0.5) 80%);
+  border: 2px solid rgba(0, 243, 255, 0.5);
+  box-shadow: 0 0 24px rgba(0, 243, 255, 0.3), inset 0 0 16px rgba(0, 243, 255, 0.2);
   pointer-events: none;
   opacity: 0;
   transform: scale(0.85);
@@ -133,17 +133,16 @@ html, body, #app {
 }
 
 #joystick-stick {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #00f3ff 0%, #0077aa 80%, #004466 100%);
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 16px rgba(0, 243, 255, 0.85);
+  background: radial-gradient(circle at 35% 35%, #00f3ff 0%, #0088cc 75%, #004466 100%);
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 0 18px rgba(0, 243, 255, 0.9);
   pointer-events: none;
   will-change: transform;
 }
 
-/* Sprint indicator arrow on joystick */
 .joystick-sprint-hint {
   position: absolute;
   top: -26px;
@@ -152,10 +151,10 @@ html, body, #app {
   font-weight: 700;
   color: var(--neon-cyan);
   letter-spacing: 1px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
-/* Right Aim Surface Zone */
+/* Right Aim Surface Zone (Handles camera rotation when touching non-button areas) */
 #aim-zone {
   position: absolute;
   top: 0;
@@ -164,32 +163,33 @@ html, body, #app {
   height: 100vh;
   pointer-events: auto;
   touch-action: none;
-  z-index: 21;
+  z-index: 41;
 }
 
-/* Action Button Container */
+/* Action Button Container - Placed in front of aim-zone */
 .touch-action-group {
   position: absolute;
+  inset: 0;
   pointer-events: none;
-  z-index: 25;
+  z-index: 50;
 }
 
 /* General Touch Button */
 .touch-btn {
-  pointer-events: auto;
-  touch-action: none;
+  pointer-events: auto !important;
+  touch-action: none !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(8, 16, 32, 0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(0, 243, 255, 0.4);
+  background: rgba(8, 16, 32, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.8px solid rgba(0, 243, 255, 0.45);
   color: var(--text-main);
   font-family: var(--font-display);
   border-radius: 50%;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 0 8px rgba(0, 243, 255, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 243, 255, 0.2);
   transition: transform 0.08s ease, border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
   user-select: none;
   -webkit-user-select: none;
@@ -197,9 +197,9 @@ html, body, #app {
 
 .touch-btn:active, .touch-btn.pressed {
   transform: scale(0.92);
-  background: rgba(0, 243, 255, 0.28);
+  background: rgba(0, 243, 255, 0.35);
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 20px var(--neon-cyan-glow), inset 0 0 14px rgba(0, 243, 255, 0.4);
+  box-shadow: 0 0 24px var(--neon-cyan-glow), inset 0 0 16px rgba(0, 243, 255, 0.5);
 }
 
 .touch-btn-icon {
@@ -209,138 +209,152 @@ html, body, #app {
 
 .touch-btn-label {
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.5px;
   margin-top: 2px;
-  opacity: 0.88;
+  opacity: 0.92;
 }
 
-/* Primary Fire Button (Right-bottom big) */
+/* ================= 右下大型メイン射撃ボタン (RIGHT-BOTTOM PRIMARY FIRE) ================= */
 #btn-fire {
   position: absolute;
-  bottom: calc(28px + var(--safe-bottom));
-  right: calc(36px + var(--safe-right));
-  width: 78px;
-  height: 78px;
+  bottom: calc(16px + var(--safe-bottom));
+  right: calc(16px + var(--safe-right));
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.28) 0%, rgba(18, 10, 24, 0.82) 80%);
-  border: 2.5px solid var(--neon-magenta);
-  box-shadow: 0 0 24px var(--neon-magenta-glow), inset 0 0 12px rgba(255, 0, 85, 0.3);
-  z-index: 26;
+  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.4) 0%, rgba(255, 70, 0, 0.25) 50%, rgba(18, 10, 24, 0.9) 90%);
+  border: 3px solid #ff0055;
+  box-shadow: 0 0 28px rgba(255, 0, 85, 0.65), 0 0 12px rgba(255, 120, 0, 0.4), inset 0 0 18px rgba(255, 0, 85, 0.5);
+  z-index: 60;
+  animation: fire-pulse 3s infinite alternate ease-in-out;
+}
+
+@keyframes fire-pulse {
+  0% { box-shadow: 0 0 24px rgba(255, 0, 85, 0.55), inset 0 0 14px rgba(255, 0, 85, 0.4); }
+  100% { box-shadow: 0 0 34px rgba(255, 0, 85, 0.85), inset 0 0 22px rgba(255, 0, 85, 0.6); }
 }
 
 #btn-fire:active, #btn-fire.pressed {
   transform: scale(0.92);
-  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.6) 0%, rgba(255, 0, 85, 0.2) 80%);
-  box-shadow: 0 0 35px var(--neon-magenta-glow), inset 0 0 20px rgba(255, 0, 85, 0.7);
+  background: radial-gradient(circle at center, rgba(255, 0, 85, 0.8) 0%, rgba(255, 50, 0, 0.5) 70%, rgba(18, 10, 24, 0.95) 100%);
+  border-color: #ff3377;
+  box-shadow: 0 0 42px rgba(255, 0, 85, 0.95), inset 0 0 26px rgba(255, 0, 85, 0.8);
 }
 
 #btn-fire .touch-btn-icon {
-  font-size: 28px;
+  font-size: 32px;
 }
 
 #btn-fire .touch-btn-label {
-  color: var(--neon-magenta);
-  font-weight: 800;
+  color: #ff3377;
+  font-size: 11px;
+  font-weight: 900;
+  text-shadow: 0 0 8px rgba(255, 0, 85, 0.8);
 }
 
-/* Secondary Left Fire Button */
+/* 左手側セカンダリ射撃ボタン (3本指・4本指スタイル用) */
 #btn-left-fire {
   position: absolute;
-  top: calc(72px + var(--safe-top));
-  left: calc(20px + var(--safe-left));
-  width: 52px;
-  height: 52px;
-  border-color: rgba(255, 0, 85, 0.45);
-  z-index: 26;
+  top: calc(70px + var(--safe-top));
+  left: calc(18px + var(--safe-left));
+  width: 54px;
+  height: 54px;
+  border-color: rgba(255, 0, 85, 0.55);
+  box-shadow: 0 0 16px rgba(255, 0, 85, 0.35);
+  z-index: 60;
 }
 
 #btn-left-fire:active, #btn-left-fire.pressed {
-  border-color: var(--neon-magenta);
-  background: rgba(255, 0, 85, 0.3);
+  border-color: #ff0055;
+  background: rgba(255, 0, 85, 0.4);
 }
 
-/* ADS / Precision Scope Button */
+#btn-left-fire .touch-btn-label {
+  color: #ff0055;
+}
+
+/* ADS / 精密照準ボタン (射撃ボタンの斜め左上) */
 #btn-ads {
   position: absolute;
   bottom: calc(118px + var(--safe-bottom));
-  right: calc(48px + var(--safe-right));
-  width: 58px;
-  height: 58px;
-  border-color: rgba(0, 243, 255, 0.6);
-  z-index: 26;
+  right: calc(114px + var(--safe-right));
+  width: 60px;
+  height: 60px;
+  border-color: rgba(0, 243, 255, 0.7);
+  z-index: 55;
 }
 
 #btn-ads.toggled {
   border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.25);
-  box-shadow: 0 0 22px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 26px rgba(255, 215, 0, 0.7), inset 0 0 14px rgba(255, 215, 0, 0.5);
 }
 
 #btn-ads.toggled .touch-btn-label {
   color: #ffd700;
 }
 
-/* Jump Button */
+/* ジャンプボタン (射撃ボタンの真上) */
 #btn-jump {
   position: absolute;
-  bottom: calc(88px + var(--safe-bottom));
-  right: calc(130px + var(--safe-right));
-  width: 56px;
-  height: 56px;
-  border-color: rgba(0, 255, 136, 0.6);
-  z-index: 26;
+  bottom: calc(122px + var(--safe-bottom));
+  right: calc(18px + var(--safe-right));
+  width: 60px;
+  height: 60px;
+  border-color: rgba(0, 255, 136, 0.7);
+  z-index: 55;
 }
 
 #btn-jump:active, #btn-jump.pressed {
   border-color: var(--neon-green);
-  background: rgba(0, 255, 136, 0.3);
+  background: rgba(0, 255, 136, 0.35);
 }
 
 #btn-jump .touch-btn-label {
   color: var(--neon-green);
 }
 
-/* Slide / Crouch Button */
+/* スライディング / しゃがみボタン (射撃ボタンのすぐ左) */
 #btn-crouch {
   position: absolute;
-  bottom: calc(24px + var(--safe-bottom));
-  right: calc(130px + var(--safe-right));
-  width: 54px;
-  height: 54px;
-  border-color: rgba(255, 183, 3, 0.6);
-  z-index: 26;
+  bottom: calc(20px + var(--safe-bottom));
+  right: calc(122px + var(--safe-right));
+  width: 56px;
+  height: 56px;
+  border-color: rgba(255, 183, 3, 0.7);
+  z-index: 55;
 }
 
 #btn-crouch:active, #btn-crouch.pressed {
   border-color: var(--neon-amber);
-  background: rgba(255, 183, 3, 0.3);
+  background: rgba(255, 183, 3, 0.35);
 }
 
 #btn-crouch .touch-btn-label {
   color: var(--neon-amber);
 }
 
-/* Reload Button */
+/* リロードボタン (ジャンプの上) */
 #btn-reload {
   position: absolute;
-  bottom: calc(118px + var(--safe-bottom));
-  right: calc(118px + var(--safe-right));
-  width: 48px;
-  height: 48px;
-  border-color: rgba(0, 243, 255, 0.5);
-  z-index: 26;
+  bottom: calc(194px + var(--safe-bottom));
+  right: calc(24px + var(--safe-right));
+  width: 50px;
+  height: 50px;
+  border-color: rgba(0, 243, 255, 0.6);
+  z-index: 55;
 }
 
-/* Tactical Grenade Button */
+/* 戦術手榴弾ボタン */
 #btn-grenade {
   position: absolute;
-  bottom: calc(182px + var(--safe-bottom));
-  right: calc(38px + var(--safe-right));
-  width: 46px;
-  height: 46px;
-  border-color: rgba(255, 80, 0, 0.6);
-  z-index: 26;
+  bottom: calc(192px + var(--safe-bottom));
+  right: calc(88px + var(--safe-right));
+  width: 48px;
+  height: 48px;
+  border-color: rgba(255, 80, 0, 0.7);
+  z-index: 55;
 }
 
 #btn-grenade .badge-count {
@@ -350,31 +364,31 @@ html, body, #app {
   background: #ff5500;
   color: #fff;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 900;
   padding: 1px 5px;
   border-radius: 8px;
   border: 1px solid #fff;
 }
 
-/* Bullet Time / Adrenaline Button */
+/* バレットタイム / アドレナリンボタン */
 #btn-bullet-time {
   position: absolute;
-  bottom: calc(178px + var(--safe-bottom));
-  right: calc(100px + var(--safe-right));
-  width: 46px;
-  height: 46px;
-  border-color: rgba(255, 215, 0, 0.6);
-  z-index: 26;
+  bottom: calc(186px + var(--safe-bottom));
+  right: calc(152px + var(--safe-right));
+  width: 48px;
+  height: 48px;
+  border-color: rgba(255, 215, 0, 0.7);
+  z-index: 55;
 }
 
 /* Top System Buttons (Pause & Fullscreen) */
 .mobile-top-actions {
   position: absolute;
-  top: calc(12px + var(--safe-top));
-  left: calc(16px + var(--safe-left));
+  top: calc(10px + var(--safe-top));
+  left: calc(14px + var(--safe-left));
   display: flex;
   gap: 10px;
-  z-index: 35;
+  z-index: 60;
   pointer-events: auto;
 }
 
@@ -382,168 +396,255 @@ html, body, #app {
   width: 38px;
   height: 38px;
   border-radius: 8px;
-  background: rgba(8, 14, 28, 0.82);
-  border: 1.5px solid rgba(0, 243, 255, 0.4);
+  background: rgba(8, 14, 28, 0.88);
+  border: 1.5px solid rgba(0, 243, 255, 0.5);
   color: var(--neon-cyan);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .mobile-sys-btn:active {
-  background: rgba(0, 243, 255, 0.3);
+  background: rgba(0, 243, 255, 0.4);
   transform: scale(0.92);
 }
 
-/* Mobile Quick Weapon Switcher (Bottom Center) */
+/* Hide fallback quick switcher if present */
 #mobile-weapon-bar {
-  position: absolute;
-  bottom: calc(10px + var(--safe-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(6, 12, 24, 0.78);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 243, 255, 0.35);
-  border-radius: 20px;
-  padding: 4px 10px;
-  z-index: 30;
-  pointer-events: auto;
+  display: none !important;
 }
 
-.mobile-wpn-switch-btn {
-  background: rgba(0, 243, 255, 0.12);
-  border: 1px solid rgba(0, 243, 255, 0.4);
-  color: var(--neon-cyan);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-}
+/* ================= FULL PC HUD COMPLETE RESTORATION ON MOBILE ================= */
 
-.mobile-wpn-switch-btn:active {
-  background: rgba(0, 243, 255, 0.4);
-}
-
-.mobile-wpn-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 110px;
-}
-
-.mobile-wpn-name {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--neon-cyan);
-}
-
-.mobile-wpn-ammo {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 800;
-  color: #fff;
-}
-
-/* ================= MOBILE HUD RESPONSIVENESS ================= */
+/* 1. HUD TOP (ウェーブ・スコア・連続キル・目標・EX高度) */
 #hud-top {
-  top: calc(10px + var(--safe-top)) !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  align-items: center;
-  width: auto !important;
-  max-width: 65vw;
+  position: absolute !important;
+  top: calc(8px + var(--safe-top)) !important;
+  left: calc(110px + var(--safe-left)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  z-index: 30 !important;
+  max-width: 45vw !important;
+  pointer-events: none !important;
+}
+
+.hud-top-row {
+  display: flex !important;
+  gap: 6px !important;
 }
 
 #hud-top .hud-panel {
-  padding: 4px 10px !important;
+  padding: 3px 8px !important;
+  background: rgba(8, 14, 28, 0.75) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(0, 243, 255, 0.3) !important;
+}
+
+#hud-top .hud-label {
+  font-size: 9px !important;
 }
 
 #hud-top .hud-value-large {
-  font-size: 18px !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
 }
 
 #hud-top .hud-value-medium {
   font-size: 14px !important;
+  line-height: 1 !important;
 }
 
+#hud-streak-val {
+  display: block !important;
+  font-size: 10px !important;
+  color: var(--neon-amber) !important;
+}
+
+.hud-enemies-status {
+  font-size: 11px !important;
+}
+
+.progress-bar-bg {
+  width: 140px !important;
+  height: 5px !important;
+}
+
+/* 2. HUD TOP RIGHT (兵装強化ステータスバッジ ＆ レーダーミニマップ) */
 #hud-top-right {
-  top: calc(10px + var(--safe-top)) !important;
+  position: absolute !important;
+  top: calc(8px + var(--safe-top)) !important;
   right: calc(12px + var(--safe-right)) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  z-index: 30 !important;
+  pointer-events: none !important;
 }
 
+/* 兵装強化ステータスバッジの完全表示 */
 #hud-upgrades-bar {
-  display: none !important; /* Hide long badge text on small screens */
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding: 4px 8px !important;
+  background: rgba(8, 14, 28, 0.72) !important;
+  border: 1px solid rgba(0, 243, 255, 0.25) !important;
+  border-radius: 6px !important;
+  max-width: 180px !important;
+}
+
+#hud-upgrades-bar .hud-label {
+  font-size: 8px !important;
+  color: var(--neon-cyan) !important;
+  margin-bottom: 2px !important;
+}
+
+.upgrade-badges-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 3px !important;
+}
+
+.upgrade-badge {
+  font-size: 9px !important;
+  padding: 1px 4px !important;
+  border-radius: 4px !important;
+  white-space: nowrap !important;
 }
 
 #minimap-container {
-  width: 96px !important;
-  height: 96px !important;
+  width: 94px !important;
+  height: 94px !important;
+  background: rgba(8, 14, 28, 0.8) !important;
 }
 
 #minimap-canvas {
-  width: 96px !important;
-  height: 96px !important;
+  width: 94px !important;
+  height: 94px !important;
 }
 
 #minimap-container .minimap-header {
-  font-size: 9px !important;
-  padding: 1px 4px !important;
+  font-size: 8px !important;
+  padding: 1px 3px !important;
 }
 
+/* 3. HUD BOTTOM LEFT (サイバーシールド・HP・スタミナ・バレットタイム) */
 #hud-bottom-left {
+  position: absolute !important;
   bottom: calc(10px + var(--safe-bottom)) !important;
   left: calc(12px + var(--safe-left)) !important;
-  max-width: 170px !important;
-  pointer-events: none;
+  max-width: 165px !important;
+  z-index: 30 !important;
+  pointer-events: none !important;
 }
 
 .vitals-panel {
-  padding: 6px 10px !important;
-  background: rgba(8, 14, 28, 0.65) !important;
+  padding: 5px 8px !important;
+  background: rgba(8, 14, 28, 0.75) !important;
   border-radius: 8px !important;
+  border: 1px solid rgba(0, 243, 255, 0.25) !important;
 }
 
 .vital-name {
-  font-size: 10px !important;
+  font-size: 9px !important;
 }
 
 .vital-num {
-  font-size: 10px !important;
+  font-size: 9px !important;
 }
 
 .bar-track {
-  height: 6px !important;
+  height: 5px !important;
 }
 
-/* Hide bulky PC weapon slots in mobile in favor of #mobile-weapon-bar */
+/* 4. HUD BOTTOM RIGHT (全6種兵装スロット ＆ 弾薬メインパネル ＆ ピップスゲージ) の完全復活 */
 #hud-bottom-right {
-  display: none !important;
+  position: absolute !important;
+  bottom: calc(8px + var(--safe-bottom)) !important;
+  right: calc(208px + var(--safe-right)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 4px !important;
+  z-index: 35 !important;
+  pointer-events: auto !important;
+  transform: scale(0.88) !important;
+  transform-origin: bottom right !important;
+}
+
+.weapon-slots-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+.weapon-slots-row {
+  display: flex !important;
+  gap: 3px !important;
+}
+
+.weapon-slot {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  padding: 2px 6px !important;
+  font-size: 10px !important;
+  background: rgba(8, 14, 28, 0.82) !important;
+  border: 1px solid rgba(0, 243, 255, 0.35) !important;
+  border-radius: 4px !important;
+}
+
+.weapon-slot:active {
+  background: rgba(0, 243, 255, 0.3) !important;
+  border-color: var(--neon-cyan) !important;
+}
+
+.weapon-slot.active {
+  border-color: var(--neon-cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.4) !important;
+}
+
+.ammo-panel {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  background: rgba(8, 14, 28, 0.85) !important;
+  border: 1px solid rgba(0, 243, 255, 0.35) !important;
+  border-radius: 6px !important;
+  min-width: 150px !important;
+}
+
+.ammo-header {
+  font-size: 11px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.ammo-readout {
+  font-size: 18px !important;
+}
+
+.ammo-canvas-display {
+  display: block !important;
+  width: 150px !important;
+  height: 14px !important;
 }
 
 /* Boss HUD on Mobile */
 .boss-hud-container {
-  top: calc(52px + var(--safe-top)) !important;
-  width: 70vw !important;
-  max-width: 440px !important;
+  top: calc(48px + var(--safe-top)) !important;
+  width: 65vw !important;
+  max-width: 420px !important;
 }
 
-/* Crosshair sizing */
+/* Crosshair */
 #crosshair {
   width: 22px !important;
   height: 22px !important;

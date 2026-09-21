@@ -49,14 +49,60 @@ class MobileCyberStrikeApp {
     // 4. Bind mobile settings (Gyro, Sensitivity, etc.)
     this.bindMobileSettings();
 
-    // 5. Setup Mobile Weapon Quick Switcher synchronization
-    this.setupWeaponSync();
+    // 5. Setup Weapon Slots and Ammo Panel touch responsiveness
+    this.setupWeaponSlotsTouch();
 
     // 6. Setup screen wake lock
     this.setupWakeLock();
 
     // 7. Prevent accidental gestures (pinch-zoom, bounce scroll)
     this.preventAccidentalGestures();
+  }
+
+  setupWeaponSlotsTouch() {
+    // Direct touch support for weapon slots 1-6
+    for (let i = 1; i <= 6; i++) {
+      const slot = document.getElementById(`slot-${i}`);
+      if (slot) {
+        slot.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (this.game && this.game.player) {
+            this.game.player.switchWeapon(i - 1);
+            const w = this.game.player.activeWeapon;
+            if (this.game.hud) {
+              this.game.hud.showPickupToast(`【兵装切替】[${i}] ${w.displayName || w.name}`, 'supply');
+            }
+          }
+        }, { passive: false });
+      }
+    }
+
+    // Direct touch support for Grenade slot
+    const slotGrenade = document.getElementById('slot-grenade');
+    if (slotGrenade) {
+      slotGrenade.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.game && this.game.state === 'PLAYING') {
+          if (!this.game.player.throwGrenade(this.game.grenades)) {
+            this.game.hud.showPickupToast('手榴弾の残弾がありません！', 'supply');
+          }
+        }
+      }, { passive: false });
+    }
+
+    // Direct touch support for Ammo panel (tap to reload)
+    const ammoPanel = document.querySelector('.ammo-panel');
+    if (ammoPanel) {
+      ammoPanel.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this.game && this.game.player && this.game.player.activeWeapon) {
+          this.game.player.activeWeapon.reload();
+        }
+      }, { passive: false });
+    }
   }
 
   bindMobileSettings() {
@@ -99,30 +145,6 @@ class MobileCyberStrikeApp {
     updateTouchSens(1.00);
   }
 
-  setupWeaponSync() {
-    const wpnNameEl = document.getElementById('mobile-wpn-name');
-    const wpnAmmoEl = document.getElementById('mobile-wpn-ammo');
-
-    // Update bottom weapon status bar continuously
-    const syncWeaponStatus = () => {
-      if (this.game && this.game.player && this.game.player.activeWeapon) {
-        const w = this.game.player.activeWeapon;
-        const curAmmo = w.currentAmmo ?? 0;
-        const resAmmo = w.reserveAmmo ?? 0;
-        const name = w.displayName || w.name || 'AK-47';
-
-        if (wpnNameEl && wpnNameEl.textContent !== name) {
-          wpnNameEl.textContent = name;
-        }
-        const ammoStr = `${curAmmo} / ${resAmmo}`;
-        if (wpnAmmoEl && wpnAmmoEl.textContent !== ammoStr) {
-          wpnAmmoEl.textContent = ammoStr;
-        }
-      }
-      requestAnimationFrame(syncWeaponStatus);
-    };
-    requestAnimationFrame(syncWeaponStatus);
-  }
 
   async setupWakeLock() {
     const requestWakeLock = async () => {
