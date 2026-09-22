@@ -114,6 +114,8 @@ export class HUD {
     this.badgeRateUp = document.getElementById('badge-rate-up');
     this.badgeDropUp = document.getElementById('badge-drop-up');
     this.badgeDoubleDrop = document.getElementById('badge-double-drop');
+    this.badgeChainUp = document.getElementById('badge-chain-up');
+    this.badgeDroneUp = document.getElementById('badge-drone-up');
     this.invincibleIndicator = document.getElementById('invincible-indicator');
     this.invincibleTimerVal = document.getElementById('invincible-timer-val');
     this.invincibleOverlay = document.getElementById('invincible-overlay');
@@ -647,6 +649,27 @@ export class HUD {
       } else {
         setText(this.badgeDoubleDrop, `倍泥: なし`);
         setClassName(this.badgeDoubleDrop, 'upgrade-badge double-drop');
+      }
+    }
+
+    if (this.badgeChainUp) {
+      if (player.chainLightningLevel > 0) {
+        setText(this.badgeChainUp, `連鎖: ${player.chainLightningTargets}体 (Lv.${player.chainLightningLevel})`);
+        if (!this.badgeChainUp.classList.contains('active')) this.badgeChainUp.classList.add('active');
+      } else {
+        setText(this.badgeChainUp, `連鎖: なし`);
+        if (this.badgeChainUp.classList.contains('active')) this.badgeChainUp.classList.remove('active');
+      }
+    }
+
+    if (this.badgeDroneUp) {
+      if (player.droneUpgradeLevel > 0) {
+        const dCount = player.drones ? player.drones.length : 0;
+        setText(this.badgeDroneUp, `援護: ${dCount}機 (Lv.${player.droneUpgradeLevel})`);
+        if (!this.badgeDroneUp.classList.contains('active')) this.badgeDroneUp.classList.add('active');
+      } else {
+        setText(this.badgeDroneUp, `援護: なし`);
+        if (this.badgeDroneUp.classList.contains('active')) this.badgeDroneUp.classList.remove('active');
       }
     }
 

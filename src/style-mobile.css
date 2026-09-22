@@ -787,13 +787,13 @@ html, body, #app {
 }
 
 #boss-hud-container .boss-name {
-  font-size: 9.5px !important;
+  font-size: 8.2px !important;
   letter-spacing: 0.5px !important;
   font-weight: 800 !important;
 }
 
 #boss-hud-container .boss-hp-text, #boss-hud-container .boss-shield-text {
-  font-size: 11px !important;
+  font-size: 8.2px !important;
   font-weight: 800 !important;
   color: #ffaa00 !important;
 }
@@ -1270,10 +1270,10 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
 }
 
-/* ================= 画面中央アナウンス (ボス表示との重なり解消・top 52pxへ配置) ================= */
+/* ================= 画面中央アナウンス (フェーズ関連表示位置を降下: ボスHUDと干渉しない中央上部 136pxへ配置) ================= */
 #hud-center-notifications {
   position: absolute !important;
-  top: calc(52px + var(--safe-top)) !important;
+  top: calc(136px + var(--safe-top)) !important;
   left: 50% !important;
   transform: translateX(-50%) scale(0.68) !important;
   transform-origin: top center !important;

@@ -47,6 +47,13 @@ const _sharedPickupGeoCache = {
   halo52: new THREE.TorusGeometry(0.52, 0.035, 8, 24),
   boxAmmo: new THREE.BoxGeometry(0.75, 0.45, 0.5),
   stripeAmmo: new THREE.BoxGeometry(0.8, 0.12, 0.52),
+  chainIco: new THREE.IcosahedronGeometry(0.30, 0),
+  chainRing1: new THREE.TorusGeometry(0.44, 0.026, 8, 24),
+  chainRing2: new THREE.TorusGeometry(0.36, 0.026, 8, 24),
+  beamChain: new THREE.CylinderGeometry(0.04, 0.04, 4.0, 8),
+  droneCoreBody: new THREE.OctahedronGeometry(0.28, 0),
+  droneRingHalo: new THREE.TorusGeometry(0.46, 0.03, 8, 24),
+  beamDrone: new THREE.CylinderGeometry(0.04, 0.04, 4.2, 8),
 };
 
 // 3D戦術アイテム用 共有マテリアルキャッシュ (同時撃破時のシェーダー再コンパイルおよびGC負荷を完全排除)
@@ -96,6 +103,15 @@ const _sharedPickupMatCache = {
   ammoBox: new THREE.MeshStandardMaterial({ color: 0x1d291b, roughness: 0.4, metalness: 0.7, emissive: 0x00f3ff, emissiveIntensity: 0.25 }),
   ammoStripe: new THREE.MeshBasicMaterial({ color: 0xffcc00 }),
   beamAmmo: new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.5 }),
+
+  chainCore: new THREE.MeshStandardMaterial({ color: 0x1a0533, roughness: 0.15, metalness: 0.95, emissive: 0xa855f7, emissiveIntensity: 0.95 }),
+  chainRingMat1: new THREE.MeshBasicMaterial({ color: 0x00ffff }),
+  chainRingMat2: new THREE.MeshBasicMaterial({ color: 0xd946ef }),
+  beamChain: new THREE.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.75 }),
+
+  droneCore: new THREE.MeshStandardMaterial({ color: 0x07272f, roughness: 0.2, metalness: 0.9, emissive: 0x06b6d4, emissiveIntensity: 0.9 }),
+  droneRingMat: new THREE.MeshBasicMaterial({ color: 0x22d3ee }),
+  beamDrone: new THREE.MeshBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.75 }),
 };
 
 function createCachedPickupMesh(geo, mat) {
@@ -1098,6 +1114,12 @@ export class CyberStrikeGame {
       } else if (p.type === 'double_drop_core') {
         this.player.upgradeDoubleDrop(0.35);
         coresCollected++;
+      } else if (p.type === 'chain_lightning_core') {
+        this.player.upgradeChainLightning();
+        coresCollected++;
+      } else if (p.type === 'drone_core') {
+        this.player.upgradeDrone(this.engine.scene, this.audio, this.particles);
+        coresCollected++;
       } else {
         this.player.addAmmoToAll(45, 12, 3, 60, 3, 90);
         this.player.grenades += 1;
@@ -1130,28 +1152,32 @@ export class CyberStrikeGame {
   spawnPickup(position, forcedType = null) {
     let type = forcedType;
     if (!type) {
-      // 内部ドロップ確率: 弾薬(18%), 医療(14%), シールド(14%), 威力コア(10%), 弾倉コア(10%), 連射コア(8%), 範囲コア(7%), 機動コア(5%), ドロップ率コア(6%), 倍ドロップコア(5%), 無敵コア(3%)
+      // 内部ドロップ確率: 弾薬(16%), 医療(12%), シールド(12%), 威力コア(9%), 弾倉コア(9%), 連射コア(7%), 範囲コア(7%), 機動コア(5%), ドロップ率コア(6%), 倍ドロップコア(6%), 連鎖放電コア(5%), ドローンコア(4%), 無敵コア(2%)
       const roll = Math.random();
-      if (roll < 0.18) {
+      if (roll < 0.16) {
         type = 'ammo';
-      } else if (roll < 0.32) {
+      } else if (roll < 0.28) {
         type = 'health';
-      } else if (roll < 0.46) {
+      } else if (roll < 0.40) {
         type = 'shield_core';
-      } else if (roll < 0.56) {
+      } else if (roll < 0.49) {
         type = 'damage_core';
-      } else if (roll < 0.66) {
+      } else if (roll < 0.58) {
         type = 'mag_core';
-      } else if (roll < 0.74) {
+      } else if (roll < 0.65) {
         type = 'fire_rate_core';
-      } else if (roll < 0.81) {
+      } else if (roll < 0.72) {
         type = 'hit_range_core';
-      } else if (roll < 0.86) {
+      } else if (roll < 0.77) {
         type = 'speed_core';
-      } else if (roll < 0.92) {
+      } else if (roll < 0.83) {
         type = 'drop_rate_core';
-      } else if (roll < 0.97) {
+      } else if (roll < 0.89) {
         type = 'double_drop_core';
+      } else if (roll < 0.94) {
+        type = 'chain_lightning_core';
+      } else if (roll < 0.98) {
+        type = 'drone_core';
       } else {
         type = 'invincible_core';
       }
@@ -1288,6 +1314,32 @@ export class CyberStrikeGame {
       const beam = createCachedPickupMesh(_sharedPickupGeoCache.beam45, _sharedPickupMatCache.beamInvincible);
       beam.position.y = 2.25;
       pickupGroup.add(beam);
+    } else if (type === 'chain_lightning_core') {
+      // 連鎖放電コア (高輝度パープル/シアンの多面体コア + 直交するデュアルエレクトリックリング)
+      const core = createCachedPickupMesh(_sharedPickupGeoCache.chainIco, _sharedPickupMatCache.chainCore);
+      pickupGroup.add(core);
+
+      const ring1 = createCachedPickupMesh(_sharedPickupGeoCache.chainRing1, _sharedPickupMatCache.chainRingMat1);
+      ring1.rotation.x = Math.PI * 0.35;
+      const ring2 = createCachedPickupMesh(_sharedPickupGeoCache.chainRing2, _sharedPickupMatCache.chainRingMat2);
+      ring2.rotation.y = Math.PI * 0.4;
+      pickupGroup.add(ring1, ring2);
+
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beamChain, _sharedPickupMatCache.beamChain);
+      beam.position.y = 2.0;
+      pickupGroup.add(beam);
+    } else if (type === 'drone_core') {
+      // 自律戦術ドローンコア (シアン/スカイブルーの回転クリスタル + 高周波ハロリング)
+      const core = createCachedPickupMesh(_sharedPickupGeoCache.droneCoreBody, _sharedPickupMatCache.droneCore);
+      pickupGroup.add(core);
+
+      const halo = createCachedPickupMesh(_sharedPickupGeoCache.droneRingHalo, _sharedPickupMatCache.droneRingMat);
+      halo.rotation.x = Math.PI * 0.45;
+      pickupGroup.add(halo);
+
+      const beam = createCachedPickupMesh(_sharedPickupGeoCache.beamDrone, _sharedPickupMatCache.beamDrone);
+      beam.position.y = 2.1;
+      pickupGroup.add(beam);
     } else {
       // 弾薬コンテナ (Cyan)
       const box = createCachedPickupMesh(_sharedPickupGeoCache.boxAmmo, _sharedPickupMatCache.ammoBox);
@@ -1380,6 +1432,20 @@ export class CyberStrikeGame {
       if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0xfbbf24, 28);
       this.hud.showPickupToast(isAuto ? `【自動回収】倍ドロップコア +35%！` : `【倍ドロップコア】2個ドロップ発生率 +35%！ (現在: ${Math.round(db * 100)}%)`, 'upgrade-double-drop');
       this.hud.showAnnouncement(`✨ 倍ドロップ確率 Lv.${this.player.doubleDropUpgradeLevel} 適用！`, 2000);
+    } else if (p.type === 'chain_lightning_core') {
+      const cInfo = this.player.upgradeChainLightning();
+      if (this.audio && this.audio.playChainLightning) this.audio.playChainLightning();
+      else this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x00ffff, 32);
+      this.hud.showPickupToast(isAuto ? `【自動回収】連鎖放電コア Lv.${cInfo.level}！` : `【連鎖放電コア】弾丸命中時に周囲${cInfo.targets}体へ電撃連鎖！(威力${Math.round(cInfo.damageRatio * 100)}%)`, 'upgrade-chain');
+      this.hud.showAnnouncement(`⚡ 連鎖放電 Lv.${cInfo.level} 獲得！ (連鎖数: ${cInfo.targets}体)`, 2000);
+    } else if (p.type === 'drone_core') {
+      const dInfo = this.player.upgradeDrone(this.engine.scene, this.audio, this.particles);
+      if (this.audio && this.audio.playDroneShot) this.audio.playDroneShot();
+      else this.audio.playBuffPickup();
+      if (this.particles && p.mesh) this.particles.createImpactSparks(p.mesh.position, new THREE.Vector3(0, 1, 0), 0x06b6d4, 32);
+      this.hud.showPickupToast(isAuto ? `【自動回収】戦術ドローンコア Lv.${dInfo.level}！` : `【自律戦術ドローン】周囲索敵＆自動迎撃ビット配備！(配備数: ${dInfo.count}機)`, 'upgrade-drone');
+      this.hud.showAnnouncement(`🛰️ 自律戦術ドローン Lv.${dInfo.level} 配備！ (${dInfo.count}機展開)`, 2000);
     } else {
       // ammo
       this.player.addAmmoToAll(45, 12, 3, 60, 3, 90);

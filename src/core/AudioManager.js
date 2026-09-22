@@ -676,6 +676,44 @@ export class AudioManager {
     });
   }
 
+  // 連鎖放電音 (電磁アークのスパーク放電音、スロットル50ms)
+  playChainLightning() {
+    if (!this.ctx) return;
+    if (!this.checkThrottle('chain_lightning', 50)) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(1400, t);
+    osc.frequency.exponentialRampToValueAtTime(320, t + 0.12);
+    gain.gain.setValueAtTime(0.35, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.13);
+
+    this.playNoiseBurst(0.08, 0.45, 4500);
+  }
+
+  // 自律ドローン射撃音 (パルスレーザー発射音、スロットル40ms)
+  playDroneShot() {
+    if (!this.ctx) return;
+    if (!this.checkThrottle('drone_shot', 40)) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(980, t);
+    osc.frequency.exponentialRampToValueAtTime(220, t + 0.08);
+    gain.gain.setValueAtTime(0.28, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.09);
+  }
+
   // ウェーブクリア時の一括回収専用サウンド (耳に優しく洗練された上昇4音アルペジオチャイム)
   playSweepCollect(count = 1) {
     if (!this.ctx) return;

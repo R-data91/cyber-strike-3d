@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PulseRifle, ScatterCannon, VortexRailgun, PlasmaSMG, HeavyGrenadeLauncher, NebulaBeamCannon } from './Arsenal.js';
+import { TacticalDrone } from './TacticalDrone.js';
 
 /**
  * First-Person Player Controller
@@ -89,6 +90,13 @@ export class Player {
     this.tripleDropChance = 0.0;
     this.tripleDropUpgradeLevel = 0;
 
+    // 新規バフ: 連鎖放電 (チェイン・ライトニング) & 自律戦術ドローン
+    this.chainLightningLevel = 0;
+    this.chainLightningTargets = 0;
+    this.chainLightningDamageRatio = 0.40;
+    this.droneUpgradeLevel = 0;
+    this.drones = [];
+
     // EXステージ状態 & 空中ジャンプ
     this.isEXStage = false;
     this.jumpCount = 0;
@@ -176,6 +184,14 @@ export class Player {
     this.doubleDropUpgradeLevel = 0;
     this.tripleDropChance = 0.0;
     this.tripleDropUpgradeLevel = 0;
+    this.chainLightningLevel = 0;
+    this.chainLightningTargets = 0;
+    this.chainLightningDamageRatio = 0.40;
+    this.droneUpgradeLevel = 0;
+    if (this.drones && this.drones.length > 0) {
+      this.drones.forEach(d => d.dispose());
+      this.drones = [];
+    }
     this.isEXStage = false;
     this.jumpCount = 0;
     this.invincibleTimer = 0.0;
@@ -294,6 +310,40 @@ export class Player {
       this.tripleDropUpgradeLevel++;
       return { type: 'triple', chance: this.tripleDropChance, level: this.tripleDropUpgradeLevel };
     }
+  }
+
+  // 連鎖放電 (チェイン・ライトニング) 強化
+  upgradeChainLightning() {
+    this.chainLightningLevel++;
+    // Lv.1: 1体(40%), Lv.2: 2体(55%), Lv.3+: 3体(70%)
+    this.chainLightningTargets = Math.min(3, this.chainLightningLevel);
+    this.chainLightningDamageRatio = Math.min(0.70, 0.40 + (this.chainLightningLevel - 1) * 0.15);
+    return {
+      level: this.chainLightningLevel,
+      targets: this.chainLightningTargets,
+      damageRatio: this.chainLightningDamageRatio
+    };
+  }
+
+  // 自律戦術ドローン (オービタル・ビット) 強化 (最大3機配備、以降は火力・射撃速度強化)
+  upgradeDrone(scene, audio, particles) {
+    this.droneUpgradeLevel++;
+    const currentCount = this.drones.length;
+    if (currentCount < 3) {
+      const droneIndex = currentCount;
+      const drone = new TacticalDrone(this, scene || this.scene, audio || this.audio, particles || this.particles, droneIndex, currentCount + 1);
+      this.drones.push(drone);
+      this.drones.forEach((d, idx) => d.updateFormation(idx, this.drones.length));
+    } else {
+      this.drones.forEach(d => {
+        d.fireInterval = Math.max(0.35, d.fireInterval * 0.88);
+        d.damage = Math.round(d.damage * 1.25);
+      });
+    }
+    return {
+      level: this.droneUpgradeLevel,
+      count: this.drones.length
+    };
   }
 
   // 5秒無敵バリア発動 (戦利品コア: 拾った個数×秒数で蓄積)
@@ -657,6 +707,13 @@ export class Player {
     this.activeWeapon.applySway({ dx, dy }, this.walkTime);
     this.activeWeapon.update(delta, isMoving && this.isGrounded, this.walkTime, this.isSliding);
 
+    // Update Tactical Autonomous Drones
+    if (this.drones && this.drones.length > 0) {
+      for (let i = 0; i < this.drones.length; i++) {
+        this.drones[i].update(delta, enemiesList);
+      }
+    }
+
     // 9. Shooting
     if (this.input.isFiring()) {
       if (this.activeWeapon.automatic || !this.wasFiring) {
@@ -820,7 +877,7 @@ export class Player {
       let hasHit = false;
       let hasCritical = false;
       hit.forEach(h => {
-        const res = this.processHit(h, true);
+        const res = this.processHit(h, true, false, enemiesList);
         if (res) {
           hasHit = true;
           if (res.isCritical) hasCritical = true;
@@ -830,11 +887,11 @@ export class Player {
         this.audio.playHitmarker(hasCritical, true);
       }
     } else if (hit) {
-      this.processHit(hit, false);
+      this.processHit(hit, false, false, enemiesList);
     }
   }
 
-  processHit(hitObj, suppressSound = false) {
+  processHit(hitObj, suppressSound = false, isChain = false, enemiesList = []) {
     if (hitObj.type === 'enemy' && hitObj.hit && hitObj.hit.object) {
       const mesh = hitObj.hit.object;
       const enemy = mesh.userData.enemy;
@@ -853,10 +910,60 @@ export class Player {
         if (this.onHitEnemy) {
           this.onHitEnemy(totalDamage, isCritical, isLethal, enemy);
         }
+
+        // 連鎖放電 (チェイン・ライトニング): 初回命中時のみ周囲の敵へアーク放電
+        if (!isChain && this.chainLightningLevel > 0 && enemiesList && enemiesList.length > 0) {
+          this.triggerChainLightning(enemy, totalDamage, enemiesList);
+        }
+
         return { isCritical, isLethal };
       }
     }
     return null;
+  }
+
+  // 周囲の敵へ電撃アークを連鎖
+  triggerChainLightning(sourceEnemy, baseDamage, enemiesList) {
+    if (!enemiesList || enemiesList.length <= 1) return;
+    const sourcePos = sourceEnemy.position ? sourceEnemy.position.clone() : new THREE.Vector3();
+    sourcePos.y += 1.0;
+
+    const candidates = [];
+    const maxRange = 9.5; // 最大9.5m以内の周囲敵へ連鎖
+    for (let i = 0; i < enemiesList.length; i++) {
+      const other = enemiesList[i];
+      if (!other || other === sourceEnemy || other.isDead || other.isDying) continue;
+      const otherPos = other.position ? other.position.clone() : new THREE.Vector3();
+      const dist = sourcePos.distanceTo(otherPos);
+      if (dist <= maxRange) {
+        candidates.push({ enemy: other, dist, pos: otherPos });
+      }
+    }
+
+    candidates.sort((a, b) => a.dist - b.dist);
+    const targetCount = Math.min(this.chainLightningTargets, candidates.length);
+    if (targetCount <= 0) return;
+
+    if (this.audio && this.audio.playChainLightning) {
+      this.audio.playChainLightning();
+    }
+
+    const chainDamage = Math.max(1, Math.round(baseDamage * this.chainLightningDamageRatio));
+
+    for (let i = 0; i < targetCount; i++) {
+      const target = candidates[i];
+      const targetHitPos = target.pos.clone();
+      targetHitPos.y += 1.0;
+
+      if (this.particles && this.particles.createChainLightning) {
+        this.particles.createChainLightning(sourcePos, targetHitPos, 0x00ffff, 0xa855f7, 0.16);
+      }
+
+      const isLethal = target.enemy.takeDamage(chainDamage, false);
+      if (this.onHitEnemy) {
+        this.onHitEnemy(chainDamage, false, isLethal, target.enemy);
+      }
+    }
   }
 
   // 弾薬補給 (全6武器一括) - 2丁流・3丁流に対応するため上限を99,999へ拡張

@@ -299,6 +299,17 @@ export class ParticleSystem {
     });
   }
 
+  // 連鎖放電 (チェイン・ライトニング) 電磁アーク＆スパーク演出
+  createChainLightning(startPos, endPos, coreColor = 0x00f3ff, outerColor = 0xa855f7, duration = 0.16) {
+    if (!startPos || !endPos) return;
+    if (isNaN(startPos.x) || isNaN(startPos.y) || isNaN(startPos.z)) return;
+    if (isNaN(endPos.x) || isNaN(endPos.y) || isNaN(endPos.z)) return;
+
+    this.createRailgunBeam(startPos, endPos, coreColor, outerColor, duration);
+    this.createImpactSparks(endPos, new THREE.Vector3(0, 1, 0), coreColor, 12);
+    this.createImpactSparks(startPos, new THREE.Vector3(0, 1, 0), outerColor, 6);
+  }
+
   // ユーザー要望: ネビュラ・ビーム専用 4段階特大ビーム演出 (最低4段階)
   // Lv.1 (細紫レーザー) -> Lv.2 (青紫電漿) -> Lv.3 (黄金衝撃プラズマ+衝撃波リング) -> Lv.4 (純白超弩級破滅光線+多重光環+閃光)
   createNebulaBeam(startPos, endPos, tierLevel = 1, duration = 0.09) {
